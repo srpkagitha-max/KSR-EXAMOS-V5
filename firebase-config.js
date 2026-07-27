@@ -1,10 +1,9 @@
 // KSR EXAM OS+ Firebase Config
 window.KSR_FIREBASE_CONFIG = {
-  apiKey: "AIzaSyAbaBregtEg9J30xVS7jmocWRAjaZmMyqE",
-  authDomain: "ksr-dsc-enterprise.firebaseapp.com",
-  projectId: "ksr-dsc-enterprise",
-  storageBucket: "ksr-dsc-enterprise.firebasestorage.app",
-  messagingSenderId: "503573969203",
-  appId: "1:503573969203:web:8b87dcfce4d2bd0be9e646",
-  measurementId: "G-ETRH1FRHNM"
+  apiKey: "AIzaSyABdatIBfO0AEr_POVUH40_UMrixyRisdMA",
+  authDomain: "ksr-exam-os-v5.firebaseapp.com",
+  projectId: "ksr-exam-os-v5",
+  storageBucket: "ksr-exam-os-v5.firebasestorage.app",
+  messagingSenderId: "421197449990",
+  appId: "1:421197449990:web:a3de71e560bfd7d2be6c87"
 };
