@@ -18,9 +18,9 @@ import {
   $,
   show,
   esc
-} from './app.js?v=20260727-create-exam-core-v4';
+} from './app.js?v=20260727-stage3-clean-core';
 
-import * as Parser from './parser.js?v=20260727-create-exam-core-v4';
+import * as Parser from './parser.js?v=20260727-stage3-clean-core';
 
 // Parser compatibility layer: using a namespace import prevents the whole Create Exam
 // module from failing when GitHub temporarily serves an older parser.js that lacks one
