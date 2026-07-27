@@ -20,7 +20,7 @@ const Q_NUMBER_RE = /^(\d{1,4})\s*(?:\.{1,3}|[:\)])\s*(.*)$/u;
 const ROMAN_RE = /^(?:I|II|III|IV|V|VI|VII|VIII|IX|X|i|ii|iii|iv|v|vi|vii|viii|ix|x)\s*[\)\.:\-]\s*/u;
 const LIST_HEADER_RE = /^(?:జాబితా|List)\s*[\-:]?\s*(?:I{1,3}|1|2)\b/iu;
 const ANSWER_WORDS = '(?:సరి(?:యైన|అయిన)\\s*)?(?:జవాబు|సమాధానం)|Correct\\s*Answer|Right\\s*Answer|Answer|Ans';
-const ANSWER_LINE_RE = new RegExp(`^[${MARK_CHARS}]?\\s*(?:${ANSWER_WORDS})\\s*[:.\\-]?\\s*([A-D1-4]|ఎ|ఏ|బి|బీ|సి|సీ|డి|డీ)(?:\\s*[\\).:\\-]?\\s*(.*))?$`, 'iu');
+const ANSWER_LINE_RE = new RegExp(`^[${MARK_CHARS}]?\s*(?:${ANSWER_WORDS})\s*[:.\-]?\s*(?:Option\s*)?([A-D1-4]|ఎ|ఏ|బి|బీ|సి|సీ|డి|డీ)(?:\s*[\).:\-]?\s*(.*))?$`, 'iu');
 const WHATSAPP_PREFIX_RE = /^\s*\[?\d{1,2}[\/.-]\d{1,2}(?:[\/.-]\d{2,4})?[, ]+\d{1,2}:\d{2}(?:\s?[AP]M)?\]?\s*(?:-\s*)?[^:\n]{1,100}:\s*/iu;
 const CHAT_LABEL_RE = /^(?:Sravanthi\s+Sister|Social|Psychology|Telugu|English|Maths?|Science)\s*:?\s*$/iu;
 const HEADING_RE = /^(?:grand\s*test|daily\s*test|dialy\s*test|psychology|telugu|english|articles?|maths?|mathematics|biology|science|method|methodology|social|social\s*studies|డైలీ\s*టెస్ట్|గ్రాండ్\s*టెస్ట్|సైకాలజీ|తెలుగు|ఇంగ్లీష్|గణితం|జీవశాస్త్రం|సాంఘికం)$/iu;
@@ -182,6 +182,25 @@ function looksLikeUnnumberedQuestionStart(lines, index) {
   return false;
 }
 
+function looksLikeRealQuestionStart(lines, index, current) {
+  const start = questionStart(lines[index]);
+  if (!start) return false;
+  const progress = optionProgress(current);
+  // Once options have started, a numbered line is normally the next question.
+  if (progress >= 2) return true;
+  // Before options, 1./2./3. lines are often statements inside one question.
+  // Confirm a new question only when A/B options appear soon after it.
+  let expected = 0;
+  for (let i = index + 1; i < Math.min(lines.length, index + 9); i++) {
+    if (i > index + 1 && questionStart(lines[i])) break;
+    const option = optionKeyFromLine(lines[i]);
+    if (!option) continue;
+    if (option.key === ['A', 'B', 'C', 'D'][expected]) expected++;
+    if (expected >= 2) return true;
+  }
+  return false;
+}
+
 function splitQuestionBlocks(lines) {
   const blocks = [];
   let current = [];
@@ -189,6 +208,7 @@ function splitQuestionBlocks(lines) {
   for (let index = 0; index < lines.length; index++) {
     const line = lines[index];
     const start = questionStart(line);
+    const confirmedStart = !current.length || looksLikeRealQuestionStart(lines, index, current);
     const unnumberedStart = looksLikeUnnumberedQuestionStart(lines, index);
 
     if (!current.length) {
@@ -196,7 +216,7 @@ function splitQuestionBlocks(lines) {
       continue;
     }
 
-    if (!start && !unnumberedStart) {
+    if (!(start && confirmedStart) && !unnumberedStart) {
       current.push(line);
       continue;
     }
@@ -223,6 +243,7 @@ function parseBlock(lines, index, defaultSubject) {
   const body = [first?.text || lines[0], ...lines.slice(1)].filter(Boolean);
   const questionLines = [];
   const options = { A: '', B: '', C: '', D: '' };
+  const blockUsesLetterOptions = body.some(value => optionKeyFromLine(value)?.scheme === 'letter');
   let answer = '';
   let currentOption = null;
 
@@ -238,6 +259,13 @@ function parseBlock(lines, index, defaultSubject) {
     }
 
     const option = optionKeyFromLine(line);
+    // In statement-type questions, numbered lines (1., 2., 3.) belong to the
+    // question body when the actual choices use A/B/C/D.
+    if (option?.scheme === 'number' && blockUsesLetterOptions) {
+      currentOption = null;
+      questionLines.push(`\n${line}`);
+      continue;
+    }
     if (option) {
       let text = option.text.trim();
       const prefixLength = Math.max(0, line.indexOf(option.text));
@@ -286,7 +314,8 @@ function detectQuestionType(questionText) {
   ];
   if (matchingSignals.some(re => re.test(text))) return 'matching';
   const romanCount = (text.match(/(?:^|\n)\s*(?:I|II|III|IV|V|i|ii|iii|iv|v)\s*[).:\-]/gu) || []).length;
-  if (romanCount >= 2 || /(?:క్రింది|పై)\s+(?:ప్రకటనలు|వాక్యాలు|statements)/iu.test(text)) return 'statement';
+  const numberedStatementCount = (text.match(/(?:^|\n)\s*[1-4]\s*[).:\-]/gu) || []).length;
+  if (romanCount >= 2 || numberedStatementCount >= 2 || /(?:క్రింది|పై)\s+(?:ప్రకటనలు|వాక్యాలు|statements)/iu.test(text)) return 'statement';
   return 'standard';
 }
 

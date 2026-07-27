@@ -1,9 +1,16 @@
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js';
-import { getFirestore, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js';
+import { initializeApp, getApps, getApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+import { getFirestore, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 
-if(!window.KSR_FIREBASE_CONFIG || window.KSR_FIREBASE_CONFIG.apiKey?.startsWith('PASTE')){
-  alert('Firebase config paste cheyyali: firebase-config.js file open chesi keys replace cheyyandi.');
+const config = window.KSR_FIREBASE_CONFIG;
+const required = ['apiKey','authDomain','projectId','storageBucket','messagingSenderId','appId'];
+const missing = required.filter(key => !String(config?.[key] || '').trim());
+if (missing.length) {
+  throw new Error(`Firebase configuration incomplete: ${missing.join(', ')}`);
 }
-export const app = initializeApp(window.KSR_FIREBASE_CONFIG);
+if (!/^[a-z0-9-]+$/i.test(config.projectId)) {
+  throw new Error('Firebase projectId format is invalid.');
+}
+
+export const app = getApps().length ? getApp() : initializeApp(config);
 export const db = getFirestore(app);
 export { serverTimestamp };

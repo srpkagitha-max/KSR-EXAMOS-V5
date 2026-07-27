@@ -1,7 +1,7 @@
 <!doctype html><html lang="te"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0"><title>KSR Multi Subject Exam Builder</title><link rel="stylesheet" href="style.css?v=20260727-stage5-green">
+<meta http-equiv="Expires" content="0"><title>KSR Multi Subject Exam Builder</title><link rel="stylesheet" href="style.css?v=20260728-v5-1-sprint1">
 <link rel="manifest" href="./manifest.json"><meta name="theme-color" content="#16865a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="KSR EXAM OS+"><link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="icon" type="image/png" href="./favicon.png">
 </head><body><div class="hero"><h1>KSR Multi Subject Exam Builder</h1><p>Enterprise v3.0 • Subject-wise Parser + Validation</p><div class="nav"><a class="btn gray" href="dashboard.html">Dashboard</a><a class="btn gray" href="index.html">Student</a></div></div>
@@ -45,4 +45,4 @@ function jumpToSubjectQuestion(si,qi){jumpToQuestion(globalIndex(si,qi));setTime
 $('studentPreviewBtn').onclick=()=>{sync();$('studentPreviewCard').style.display='block';const qs=studentShuffle(allQuestions(),'preview-student');let html='',last='';qs.slice(0,Math.min(qs.length,20)).forEach((q,i)=>{if((q.subject||'General')!==last){last=q.subject||'General';html+=`<h3 class="subjectTitle">${esc(last)}</h3>`}html+=`<div class="previewQ"><h2>Q${i+1}. ${esc(q.question).replace(/\n/g,'<br>')}</h2>${q.options.map(o=>`<label class="qcard"><input type="radio" disabled> ${o.key}) ${esc(o.text)}</label>`).join('')}</div>`});$('studentPreview').innerHTML=html||'<p>No questions</p>';$('studentPreviewCard').scrollIntoView({behavior:'smooth'})};
 $('saveAll').onclick=async()=>{try{sync();const v=validate();currentExam=$('examSelect').value;if(!currentExam)return show('Exam select cheyyandi','err');if(!v.qs.length)return show('Questions levu','err');if(v.issues.length)return show('Validation issues fix cheyyandi','err');await setDoc(doc(db,'examQuestions',currentExam),{examId:currentExam,subjects:subjects.map((s,order)=>({name:s.name.trim()||'General',order,questionCount:s.questions.length})),questions:v.qs,questionCount:v.qs.length,shuffleWithinSubject:true,keepSubjectOrder:true,updatedAt:serverTimestamp()});await updateDoc(doc(db,'exams',currentExam),{questionCount:v.qs.length,subjectCount:subjects.length,updatedAt:serverTimestamp()});clearDraft();show('Exam questions saved ✅ Total: '+v.qs.length)}catch(e){show(e.message,'err')}};
 window.addEventListener('beforeunload',saveDraft);
-</script><script src="./pwa-register.js?v=20260727-stage5-green"></script></body></html>
+</script><script src="./pwa-register.js?v=20260728-v5-1-sprint1"></script></body></html>

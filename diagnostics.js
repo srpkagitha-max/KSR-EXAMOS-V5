@@ -1,7 +1,7 @@
 import { parseQuestionsDetailed } from './parser.js';
 
 const $ = id => document.getElementById(id);
-const REQUIRED_FILES = ['index.html','login.html','dashboard.html','exam.html','result.html','questions.html','question-bank.html','master-data.html','live-monitor.html','style.css','app.js','firebase-config.js','admin-daily.js','parser.js','service-worker.js','manifest.json','icon-192.png','icon-512.png'];
+const REQUIRED_FILES = ['index.html','login.html','dashboard.html','exam.html','result.html','questions.html','question-bank.html','master-data.html','live-monitor.html','style.css','app.js','firebase-config.js','admin-daily.js','parser.js','service-worker.js','manifest.json','version.json','icon-192.png','icon-512.png'];
 const REQUIRED_DASHBOARD_IDS = ['instituteId','batchId','examId','startTime','endTime','secondsPerQuestion','rawBits','parseBtn','saveExamBtn'];
 let checks = [];
 
@@ -22,12 +22,34 @@ async function run(){
   try{sessionStorage.setItem('ksr_diag','ok');add('Session storage',sessionStorage.getItem('ksr_diag')==='ok','Exam session support available');sessionStorage.removeItem('ksr_diag');}catch(e){add('Session storage',false,e.message);}
   add('Service Worker support','serviceWorker' in navigator,'PWA/offline shell support');
   add('Secure connection',location.protocol==='https:'||location.hostname==='localhost',location.protocol);
-  try{await import(`./firebase-config.js?check=${Date.now()}`);const cfg=window.KSR_FIREBASE_CONFIG;add('Firebase configuration',Boolean(cfg&&cfg.apiKey&&cfg.projectId),cfg?.projectId||'Missing apiKey/projectId');}catch(e){add('Firebase configuration',false,e.message);}
+  try{
+    await import(`./firebase-config.js?check=${Date.now()}`);
+    const cfg=window.KSR_FIREBASE_CONFIG;
+    const required=['apiKey','authDomain','projectId','storageBucket','messagingSenderId','appId'];
+    const missing=required.filter(key=>!String(cfg?.[key]||'').trim());
+    add('Firebase configuration',missing.length===0,missing.length?`Missing: ${missing.join(', ')}`:`Project: ${cfg.projectId}`);
+    add('Firebase project consistency',Boolean(cfg?.authDomain?.startsWith(`${cfg?.projectId}.`) && cfg?.storageBucket?.startsWith(cfg?.projectId)),`${cfg?.authDomain||'-'} / ${cfg?.storageBucket||'-'}`);
+  }catch(e){add('Firebase configuration',false,e.message);}
   try{
     const sample=`1. Zero additive inverse ఏది?\nA) 0 ●\nB) 1\nC) -1\nD) 2\n\n2. 2 + 2 విలువ?\nA) 2\nB) 3\nC) 4 ●\nD) 5`;
     const out=parseQuestionsDetailed(sample,'Maths');
     add('Question parser',out.questions.length===2&&out.questions.every(q=>q.options.length>=4),`${out.questions.length} / 2 questions parsed`);
     add('Correct answer detection',out.questions[0]?.answer==='A'&&out.questions[1]?.answer==='C',`Detected: ${out.questions.map(q=>q.answer||'-').join(', ')}`);
+    const statementSample=`1. క్రింది వాక్యాలను పరిశీలించండి:
+1. మొదటి వాక్యం
+2. రెండవ వాక్యం
+3. మూడవ వాక్యం
+A) 1, 2 మాత్రమే ●
+B) 2, 3 మాత్రమే
+C) 1, 3 మాత్రమే
+D) అన్నీ
+2. తదుపరి ప్రశ్న?
+A) ఒకటి
+B) రెండు ●
+C) మూడు
+D) నాలుగు`;
+    const statementOut=parseQuestionsDetailed(statementSample,'General');
+    add('Numbered statement preservation',statementOut.questions.length===2 && statementOut.questions[0]?.question.includes('2. రెండవ వాక్యం'),`${statementOut.questions.length} questions; statements preserved`);
   }catch(e){add('Question parser',false,e.message);}
   try{const html=await (await fetch(`./dashboard.html?check=${Date.now()}`,{cache:'no-store'})).text();const missing=REQUIRED_DASHBOARD_IDS.filter(id=>!html.includes(`id="${id}"`));add('Create Exam controls',missing.length===0,missing.length?`Missing: ${missing.join(', ')}`:'All required controls found');}catch(e){add('Create Exam controls',false,e.message);}
   render();
