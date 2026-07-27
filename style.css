@@ -704,3 +704,6 @@ tbody tr:hover{background:#eef5ff}
 }
 
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* Stage 4 — diagnostics */
+.diagnosticCard{max-width:920px;margin:24px auto}.diagnosticSummary{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0}.diagnosticSummary span{background:#eef3fb;border:1px solid #d9e3f2;border-radius:12px;padding:10px 14px}.diagnosticSummary .diagPass{background:#ecfdf3;border-color:#b7ebca}.diagnosticSummary .diagFail{background:#fff1f1;border-color:#f3c2c2}.diagnosticList{display:grid;gap:10px;margin-top:16px}.diagnosticItem{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;border:1px solid #dbe4f0;border-radius:14px;background:#fff}.diagnosticItem>span{display:grid;place-items:center;min-width:30px;height:30px;border-radius:50%;font-weight:900}.diagnosticItem p{margin:4px 0 0;color:#607086;font-size:13px;word-break:break-word}.diagnosticItem.isPass>span{background:#dcfce7;color:#137333}.diagnosticItem.isFail{border-color:#f0b9b9;background:#fffafa}.diagnosticItem.isFail>span{background:#fee2e2;color:#b42318}@media(max-width:600px){.diagnosticCard{margin:12px auto}.diagnosticSummary span{flex:1;min-width:90px;text-align:center}}

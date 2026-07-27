@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ksr-exam-os-plus-stage3-clean-core-20260727';
+const CACHE_NAME = 'ksr-exam-os-plus-stage4-stability-20260727';
 const APP_SHELL = [
   './offline.html', './manifest.json', './icon-192.png', './icon-512.png'
 ];
