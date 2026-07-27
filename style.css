@@ -445,3 +445,262 @@
 .brandHeroIcon{width:86px;height:86px;border-radius:24px;box-shadow:0 16px 35px rgba(0,0,0,.24);margin-bottom:12px}
 .brandHero strong{display:inline-block;margin-top:7px;padding:7px 14px;border-radius:999px;background:rgba(230,176,55,.16);border:1px solid rgba(230,176,55,.55);color:#fff}
 .hero,.adminTopbar,.simpleLoginHeader{background:linear-gradient(135deg,var(--ksr-navy),var(--ksr-blue))!important}
+
+/* =========================================================
+   KSR EXAM OS+ — STAGE 2 MODERN UI
+   Royal Blue + White + Gold, mobile-first, logic-safe overrides
+   ========================================================= */
+:root{
+  --ksr-navy:#071a3d;
+  --ksr-blue:#0d47a1;
+  --ksr-blue-2:#1769d2;
+  --ksr-blue-soft:#eef5ff;
+  --ksr-gold:#d6a527;
+  --ksr-gold-soft:#fff8e3;
+  --ksr-ink:#10213b;
+  --ksr-muted:#64748b;
+  --ksr-line:#dbe5f1;
+  --ksr-bg:#f3f7fc;
+  --ksr-white:#ffffff;
+  --ksr-success:#15803d;
+  --ksr-danger:#c62828;
+  --ksr-radius:18px;
+  --ksr-shadow:0 12px 35px rgba(7,26,61,.10);
+  --ksr-shadow-soft:0 6px 20px rgba(7,26,61,.07);
+}
+
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(circle at 8% 0%,rgba(23,105,210,.08),transparent 28%),
+    linear-gradient(180deg,#f8fbff 0%,var(--ksr-bg) 100%);
+  color:var(--ksr-ink);
+  font-family:Inter,"Noto Sans Telugu","Segoe UI",Roboto,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+body::selection{background:#cfe2ff;color:var(--ksr-navy)}
+
+.wrap{max-width:1240px;margin-inline:auto;padding-inline:18px}
+.card,.adminWorkPanel,.adminHomePanel{
+  border:1px solid rgba(13,71,161,.10);
+  border-radius:var(--ksr-radius);
+  box-shadow:var(--ksr-shadow-soft);
+}
+.card{background:rgba(255,255,255,.96);padding:20px}
+.card h2,.card h3,.adminWorkPanel h2,.adminWorkPanel h3{letter-spacing:-.02em;color:var(--ksr-navy)}
+.small,.muted{color:var(--ksr-muted)!important;line-height:1.6}
+
+/* Buttons */
+button,.btn,a.btn{
+  min-height:42px;
+  border-radius:12px!important;
+  font-weight:800;
+  letter-spacing:.01em;
+  transition:transform .16s ease,box-shadow .16s ease,background .16s ease,border-color .16s ease;
+}
+button:not(:disabled):hover,.btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(13,71,161,.16)}
+button:active,.btn:active{transform:translateY(0)}
+button:not(.gray):not(.danger):not(.orange),.btn:not(.gray):not(.danger):not(.orange){
+  background:linear-gradient(135deg,var(--ksr-blue),var(--ksr-blue-2));
+  border-color:transparent;
+  color:#fff;
+}
+button.gray,.btn.gray{background:#fff;color:var(--ksr-blue);border:1px solid #cddcf0}
+button.orange,.btn.orange{background:linear-gradient(135deg,#c99212,var(--ksr-gold));color:#fff;border-color:transparent}
+button.danger,.btn.danger{background:linear-gradient(135deg,#a91f1f,#d23a3a);color:#fff;border-color:transparent}
+button:disabled{opacity:.52;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+
+/* Forms */
+label{color:#31445f;font-size:.86rem;font-weight:800;margin-bottom:7px}
+input,select,textarea{
+  border:1px solid #ccd9e9!important;
+  border-radius:12px!important;
+  background:#fff!important;
+  color:var(--ksr-ink)!important;
+  min-height:44px;
+  padding:10px 12px!important;
+  box-shadow:inset 0 1px 2px rgba(7,26,61,.03);
+  transition:border-color .15s ease,box-shadow .15s ease;
+}
+textarea{min-height:150px;line-height:1.55}
+input:focus,select:focus,textarea:focus{
+  outline:0!important;
+  border-color:var(--ksr-blue-2)!important;
+  box-shadow:0 0 0 4px rgba(23,105,210,.12)!important;
+}
+input[readonly]{background:#f4f7fb!important;color:#52657e!important}
+
+/* Modern admin topbar */
+.adminTopbar{
+  position:sticky;top:0;z-index:60;
+  min-height:74px;
+  padding:10px max(16px,calc((100vw - 1240px)/2));
+  background:linear-gradient(100deg,var(--ksr-navy),#0b3475 72%,#124f9e);
+  border-bottom:3px solid var(--ksr-gold);
+  box-shadow:0 10px 28px rgba(7,26,61,.18);
+  backdrop-filter:blur(14px);
+}
+.adminBrandLine img{width:48px;height:48px;border-radius:14px;background:#fff;padding:4px;box-shadow:0 5px 16px rgba(0,0,0,.18)}
+.adminBrandLine h1{font-size:1.2rem;line-height:1.1;margin:0;color:#fff;letter-spacing:.01em}
+.adminBrandLine p{margin:5px 0 0;color:#d9e8ff;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase}
+.adminTopActions{gap:8px}.adminTopActions .btn,.adminTopActions button{min-height:38px;padding:8px 14px}
+
+/* Dashboard hero + features */
+.adminHomePanel{background:transparent!important;border:0!important;box-shadow:none!important;padding:24px 0 34px}
+.adminWelcome{
+  position:relative;overflow:hidden;
+  padding:26px 28px;margin-bottom:18px;
+  border-radius:22px;
+  color:#fff;
+  background:linear-gradient(120deg,var(--ksr-navy),var(--ksr-blue) 70%,#1e73d8);
+  box-shadow:var(--ksr-shadow);
+}
+.adminWelcome::after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;right:-90px;top:-120px;background:rgba(214,165,39,.18);border:35px solid rgba(255,255,255,.06)}
+.adminWelcome h2{position:relative;z-index:1;color:#fff!important;font-size:clamp(1.45rem,4vw,2rem);margin:0 0 6px}
+.adminWelcome p{position:relative;z-index:1;margin:0;color:#dce9ff}
+.featureGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+.featureCard{
+  position:relative;overflow:hidden;
+  min-height:168px;
+  padding:20px!important;
+  border:1px solid rgba(13,71,161,.11)!important;
+  border-radius:20px!important;
+  background:#fff!important;
+  color:var(--ksr-ink)!important;
+  box-shadow:var(--ksr-shadow-soft)!important;
+  text-align:left;
+}
+.featureCard::before{content:"";position:absolute;left:0;top:0;width:100%;height:5px;background:linear-gradient(90deg,var(--ksr-blue),var(--ksr-gold))}
+.featureCard::after{content:"→";position:absolute;right:18px;bottom:16px;color:var(--ksr-blue);font-size:1.2rem;font-weight:900;opacity:.75}
+.featureCard>span{display:grid;place-items:center;width:46px;height:46px;margin-bottom:14px;border-radius:14px;background:var(--ksr-blue-soft);font-size:1.35rem}
+.featureCard b{font-size:1.02rem;color:var(--ksr-navy)}
+.featureCard small{display:block;margin-top:7px;padding-right:25px;color:var(--ksr-muted);line-height:1.45}
+.featureCard:hover{transform:translateY(-4px)!important;border-color:rgba(13,71,161,.28)!important;box-shadow:0 18px 40px rgba(7,26,61,.13)!important}
+.featureGold::before,.featureOrange::before{background:linear-gradient(90deg,#bd8610,var(--ksr-gold))}
+.featureGreen::before{background:linear-gradient(90deg,#0f7b42,#33aa65)}
+.featurePurple::before{background:linear-gradient(90deg,#6340b7,#8b6fe0)}
+.featureRed::before{background:linear-gradient(90deg,#b3261e,#e0524a)}
+
+/* Admin work panels and section headers */
+.adminWorkPanel{margin:24px 0 36px;padding:0;background:transparent!important;border:0!important;box-shadow:none!important}
+.backHomeBtn{margin-bottom:13px;background:#fff!important;color:var(--ksr-blue)!important;border:1px solid #ccdaeb!important}
+.sectionHeadRow,.subjectBuilderHead,.duplicateEngineHead,.questionTypeAnalyzerHead,.smartAnalyticsHead,.examQualityHead,.bulkManagerHead{
+  padding-bottom:13px;margin-bottom:15px;border-bottom:1px solid var(--ksr-line)
+}
+.multiSubjectBuilder,.duplicateEngineCard,.questionTypeAnalyzerCard,.smartAnalyticsCard,.examQualityCard,.bulkManagerCard{
+  border:1px solid var(--ksr-line)!important;
+  border-radius:17px!important;
+  background:#fff!important;
+  box-shadow:0 5px 17px rgba(7,26,61,.055);
+}
+.multiSubjectBuilder{padding:18px}
+.subjectTab{border-radius:11px!important;border-color:#d2dfef!important;background:#f6f9fd!important}
+.subjectTab.active{background:linear-gradient(135deg,var(--ksr-blue),var(--ksr-blue-2))!important;color:#fff!important;border-color:transparent!important;box-shadow:0 5px 14px rgba(13,71,161,.22)}
+
+/* Question cards */
+.qcard{
+  border:1px solid #dce6f2!important;
+  border-left:5px solid var(--ksr-blue)!important;
+  border-radius:16px!important;
+  background:#fff!important;
+  box-shadow:0 5px 16px rgba(7,26,61,.06)!important;
+  margin-bottom:13px!important;
+}
+.qcard:hover{border-color:#b9cee8!important;box-shadow:0 10px 25px rgba(7,26,61,.09)!important}
+.qcard .qhead{background:linear-gradient(90deg,#f3f7fd,#fff);border-radius:11px;padding:10px}
+.issueJump{border-radius:12px!important}
+
+/* Question bank */
+.qbV2Body .card{margin-bottom:16px}
+.bankQuestionRow{border-radius:14px!important;border-color:#d9e4f1!important;box-shadow:0 3px 10px rgba(7,26,61,.04)}
+.bankQuestionRow:hover{background:#f8fbff!important;border-color:#b8cee8!important}
+
+/* Student/login screens */
+.simpleStudentLogin,.simpleStudentLogin body{min-height:100vh}
+.simpleStudentLogin{
+  background:
+    radial-gradient(circle at 15% 10%,rgba(214,165,39,.16),transparent 28%),
+    radial-gradient(circle at 90% 20%,rgba(23,105,210,.15),transparent 30%),
+    linear-gradient(150deg,#061938,#0b3472 55%,#0d47a1);
+}
+.simpleStudentLogin .loginCard,.login-card,.auth-card,.setup-card{
+  border:1px solid rgba(255,255,255,.68)!important;
+  border-radius:24px!important;
+  box-shadow:0 24px 65px rgba(0,0,0,.24)!important;
+  background:rgba(255,255,255,.97)!important;
+  backdrop-filter:blur(16px);
+}
+.simpleStudentLogin img{filter:drop-shadow(0 8px 18px rgba(7,26,61,.18))}
+
+/* CBT exam layout */
+.examBody{background:#edf3fa!important}
+.examBody .examTop,.examBody .topbar,.examBody header{
+  background:linear-gradient(100deg,var(--ksr-navy),var(--ksr-blue))!important;
+  border-bottom:3px solid var(--ksr-gold)!important;
+  color:#fff!important;
+}
+.examBody .questionPanel,.examBody .sidePanel,.examBody .palettePanel{
+  border-radius:16px!important;
+  border:1px solid #d7e2ef!important;
+  box-shadow:var(--ksr-shadow-soft)!important;
+}
+.examBody .questionText{font-size:clamp(1rem,2.4vw,1.17rem)!important;line-height:1.68!important;color:#12253e!important}
+.examBody .option,.examBody .opt{
+  border-radius:13px!important;
+  border:1px solid #d5e0ed!important;
+  background:#fff!important;
+  transition:.15s ease;
+}
+.examBody .option:hover,.examBody .opt:hover{border-color:#85ace0!important;background:#f5f9ff!important}
+.examBody .option.selected,.examBody .opt.selected{border:2px solid var(--ksr-blue)!important;background:#edf5ff!important;box-shadow:0 0 0 3px rgba(23,105,210,.09)}
+.examBody .pbtn,.examBody .dot{border-radius:10px!important}
+.examBody .subjectTabs{box-shadow:0 4px 14px rgba(7,26,61,.06)}
+.examStatusStrip{background:#f6f9fd!important;border-color:#d6e1ee!important}
+
+/* Result */
+.resultHero{background:linear-gradient(120deg,var(--ksr-navy),var(--ksr-blue) 72%,#1a69c7)!important;border-bottom:4px solid var(--ksr-gold)}
+.resultWrap .card{border-radius:18px!important}
+.scoreRing{box-shadow:inset 0 0 0 12px #fff,0 10px 30px rgba(7,26,61,.10)!important}
+.rankCard{border-radius:16px!important;background:linear-gradient(145deg,#f1f6ff,#fff9e8)!important}
+.resultCounts article{border-radius:16px!important}
+
+/* Tables */
+table{border-radius:14px;overflow:hidden}
+th{background:var(--ksr-navy)!important;color:#fff!important;letter-spacing:.02em}
+td,th{padding:11px 12px!important}
+tbody tr:nth-child(even){background:#f8fbff}
+tbody tr:hover{background:#eef5ff}
+
+/* Toast/message surfaces */
+#msg:not(:empty){position:relative;margin:14px 0;padding:12px 14px;border-radius:12px;background:#eef6ff;border:1px solid #c6dbf4;color:#143b6b;font-weight:700}
+
+/* Modern scrollbar */
+*{scrollbar-width:thin;scrollbar-color:#91acd0 #edf3fa}
+*::-webkit-scrollbar{width:9px;height:9px}
+*::-webkit-scrollbar-track{background:#edf3fa}
+*::-webkit-scrollbar-thumb{background:#91acd0;border-radius:999px;border:2px solid #edf3fa}
+
+/* Responsive */
+@media(max-width:1050px){.featureGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){
+  .wrap{padding-inline:12px}
+  .adminTopbar{min-height:64px;padding:8px 11px}
+  .adminBrandLine img{width:42px;height:42px;border-radius:12px}
+  .adminBrandLine h1{font-size:1rem}.adminBrandLine p{font-size:.65rem}
+  .adminTopActions .btn{display:none}
+  .featureGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+  .featureCard{min-height:150px;padding:16px!important;border-radius:17px!important}
+  .featureCard>span{width:40px;height:40px;margin-bottom:11px}
+  .adminWelcome{padding:21px 19px;border-radius:18px}
+  .card{padding:15px}
+  .multiSubjectBuilder{padding:13px}
+}
+@media(max-width:460px){
+  .featureGrid{grid-template-columns:1fr}
+  .featureCard{min-height:125px}
+  .featureCard small{max-width:88%}
+  .action-row>*{width:100%}
+  input,select,textarea{font-size:16px!important}
+}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
