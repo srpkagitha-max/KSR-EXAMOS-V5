@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ksr-examos-create-exam-core-v5-20260727';
+const CACHE_NAME = 'ksr-exam-os-plus-stage1-20260727';
 const APP_SHELL = [
   './offline.html', './manifest.json', './icon-192.png', './icon-512.png'
 ];

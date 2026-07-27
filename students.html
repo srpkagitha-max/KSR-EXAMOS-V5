@@ -1,16 +1,17 @@
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0"><title>KSR Student Master</title><link rel="stylesheet" href="style.css">
+<meta http-equiv="Expires" content="0"><title>KSR EXAM OS+ Student Master</title><link rel="stylesheet" href="style.css">
 <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#064a86">
+<meta name="theme-color" content="#061a42">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="KSR EXAMOS">
+<meta name="apple-mobile-web-app-title" content="KSR EXAM OS+">
 <link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="icon" type="image/png" href="./favicon.png">
 </head><body>
-<div class="hero"><h1>KSR Student Master</h1><p>Version 1.1 Enterprise • Student Access Codes</p><div class="nav"><a class="btn gray" href="dashboard.html">Dashboard</a><a class="btn orange" href="questions.html">Question Editor</a><button class="gray" id="logout">Logout</button></div></div>
+<div class="hero"><h1>KSR EXAM OS+ Student Master</h1><p>Version 1.1 Enterprise • Student Access Codes</p><div class="nav"><a class="btn gray" href="dashboard.html">Dashboard</a><a class="btn orange" href="questions.html">Question Editor</a><button class="gray" id="logout">Logout</button></div></div>
 <div class="wrap"><div id="msg"></div>
 <div class="card"><h2>Add Student / Generate Unique Code</h2><div class="grid two"><div><label>Institute</label><select id="institute"></select></div><div><label>Exam</label><select id="exam"></select></div><div><label>Student Name</label><input id="name" placeholder="Student name"></div><div><label>Hall Ticket</label><input id="hall" placeholder="Hall ticket number"></div><div><label>Mobile</label><input id="mobile" placeholder="Mobile number"></div><div><label>Batch / Section</label><input id="batch" placeholder="Batch or section"></div><div><label>Photo URL (Optional)</label><input id="photo" placeholder="https://..."></div><div><label>Unique Student Code</label><div class="examCodeRow"><input id="studentCode" placeholder="Auto-generated"><button type="button" class="gray" id="generate">Generate</button></div></div></div><button class="green" id="save">Save Student Access</button></div>
 <div class="card"><h2>Student Search</h2><input id="search" placeholder="Search by name, hall ticket, mobile or code"><div id="list"></div></div>

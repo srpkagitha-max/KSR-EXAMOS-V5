@@ -1,7 +1,7 @@
 {
-  "name": "KSR EXAMOS - Online Examination Platform",
-  "short_name": "KSR EXAMOS",
-  "description": "KSR Online Examination Platform for daily tests, student exams, results and ranks.",
+  "name": "KSR EXAM OS+ - Professional Online Examination Platform",
+  "short_name": "KSR EXAM OS+",
+  "description": "Smart, secure and scalable online examination platform for institutes, students, results and ranks.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
@@ -10,8 +10,8 @@
     "standalone",
     "minimal-ui"
   ],
-  "background_color": "#eef5ff",
-  "theme_color": "#064a86",
+  "background_color": "#061a42",
+  "theme_color": "#061a42",
   "orientation": "portrait-primary",
   "lang": "en-IN",
   "categories": [

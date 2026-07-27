@@ -2,14 +2,15 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0"><title>KSR Multi Subject Exam Builder</title><link rel="stylesheet" href="style.css">
-<link rel="manifest" href="./manifest.json"><meta name="theme-color" content="#064a86"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="KSR EXAMOS"><link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="manifest" href="./manifest.json"><meta name="theme-color" content="#061a42"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="KSR EXAM OS+"><link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="icon" type="image/png" href="./favicon.png">
 </head><body><div class="hero"><h1>KSR Multi Subject Exam Builder</h1><p>Enterprise v3.0 • Subject-wise Parser + Validation</p><div class="nav"><a class="btn gray" href="dashboard.html">Dashboard</a><a class="btn gray" href="index.html">Student</a></div></div>
 <div class="wrap"><div id="msg"></div>
 <div class="card"><h2>Select Exam</h2><label>Exam</label><select id="examSelect"></select><button id="loadExam">Load Exam</button></div>
 <div class="card"><div class="sectionHeadRow"><div><h2>Subjects</h2><p class="small">Subject name ikkada okkasare enter cheyyandi. Questions, Question Bank, Student headings ki automatic ga velthundi.</p></div><button class="green" id="addSubject">+ Add Subject</button></div><div id="subjectEditors"></div></div>
 <div class="card"><h2>Exam Summary</h2><div id="stats" class="statsGrid"></div><div id="issues"></div><div class="grid"><button class="orange" id="studentPreviewBtn">Student Exam Preview</button><button class="green" id="saveAll">Final Save to Firebase</button></div></div>
 <div class="card"><h2>Admin Preview / Editor <span class="pill" id="count">0 Questions</span></h2><div id="list"></div></div>
-<div class="card" id="studentPreviewCard" style="display:none"><h2>Student Exam Screen Preview</h2><div class="examShell"><div class="examTop"><b>KSR DSC Exam Preview</b><span class="timer">60:00</span></div><div id="studentPreview"></div></div></div>
+<div class="card" id="studentPreviewCard" style="display:none"><h2>Student Exam Screen Preview</h2><div class="examShell"><div class="examTop"><b>KSR EXAM OS+ Preview</b><span class="timer">60:00</span></div><div id="studentPreview"></div></div></div>
 </div>
 <script type="module">
 import{auth,db,onAuthStateChanged,collection,getDocs,doc,setDoc,updateDoc,serverTimestamp,$,show,esc}from'./app.js';

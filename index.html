@@ -7,23 +7,24 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
   <meta name="theme-color" content="#061a42">
-  <title>KSR Online Exams</title>
+  <title>KSR EXAM OS+</title>
   <link rel="stylesheet" href="style.css">
 
 <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#064a86">
+<meta name="theme-color" content="#061a42">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="KSR EXAMOS">
+<meta name="apple-mobile-web-app-title" content="KSR EXAM OS+">
 <link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="icon" type="image/png" href="./favicon.png">
 </head>
 <body class="simpleStudentLogin">
   <header class="simpleLoginHeader">
-    <div class="simpleBrandMark">KSR</div>
+    <div class="simpleBrandMark brandOsMark"><span>KSR</span><small>OS+</small></div>
     <div>
-      <h1>KSR ONLINE EXAMS</h1>
-      <p>Professional MCQ Examination Platform</p>
+      <h1>KSR EXAM OS+</h1>
+      <p>Smart • Secure • Scalable Examination Platform</p>
       <a href="tel:9063012104">Help Desk: 9063012104</a>
     </div>
   </header>
@@ -60,7 +61,7 @@
 
       <a class="simpleAdminLink" href="login.html">Administrator Login</a>
     </section>
-    <footer class="simpleLoginFooter">Powered by KSR Technologies</footer>
+    <footer class="simpleLoginFooter">KSR EXAM OS+ • Smart • Secure • Scalable</footer>
   </main>
 
 <script type="module">
@@ -130,7 +131,7 @@ async function showExamPreview(){
     const qCount=Number(exam.questionCount)||'—';
     const now=Date.now(),st=Date.parse(exam.startTime||exam.start||''),en=Date.parse(exam.endTime||exam.end||'');
     const status=st&&now<st?'UPCOMING':en&&now>en?'CLOSED':'LIVE';
-    box.innerHTML=`<div class="verifyHead"><b>✓ Exam Verified</b><span class="examStatus ${status.toLowerCase()}">${status}</span></div><div class="verifyGrid"><div><span>Institute</span><b>${exam.instituteName||'KSR Online Exams'}</b></div><div><span>Batch</span><b>${exam.batchName||'Open Batch'}</b></div><div><span>Exam</span><b>${exam.title||examPublicId}</b></div><div><span>Start</span><b>${fmt(exam.startTime||exam.start)}</b></div><div><span>Questions</span><b>${qCount}</b></div></div>`;
+    box.innerHTML=`<div class="verifyHead"><b>✓ Exam Verified</b><span class="examStatus ${status.toLowerCase()}">${status}</span></div><div class="verifyGrid"><div><span>Institute</span><b>${exam.instituteName||'KSR EXAM OS+'}</b></div><div><span>Batch</span><b>${exam.batchName||'Open Batch'}</b></div><div><span>Exam</span><b>${exam.title||examPublicId}</b></div><div><span>Start</span><b>${fmt(exam.startTime||exam.start)}</b></div><div><span>Questions</span><b>${qCount}</b></div></div>`;
   }catch(error){console.error(error);box.innerHTML=`<div class="verifyError">${error.message||'Exam verify avvaledu. Internet check cheyyandi.'}</div>`;}
 }
 $('examId').addEventListener('blur',showExamPreview);
