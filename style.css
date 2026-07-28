@@ -783,3 +783,11 @@ textarea{line-height:1.55;resize:vertical}
 
 /* V5.1 Stable Master Loader */
 .masterReloadRow{grid-column:1/-1;display:grid;gap:10px;margin-top:-4px}.masterReloadRow button{width:100%}.masterLoadStatus{padding:12px 14px;border-radius:14px;background:#fff7ed;border-left:5px solid #f97316;font-weight:800;color:#23463a}.masterLoadStatus.loading{background:#fff7ed;border-color:#f97316}.masterLoadStatus.ok{background:#ecfdf5;border-color:#16a34a;color:#166534}.masterLoadStatus.err{background:#fef2f2;border-color:#dc2626;color:#991b1b}select:disabled{opacity:.72;cursor:wait}
+
+/* V5.1 Functional Health Card */
+.questionsHealthCard{margin-top:18px;padding:18px;border:1px solid #cfe7da;background:#f8fffb}
+.questionsHealthIntro h3{margin:0 0 6px;color:#145c43}
+.questionsHealthIntro p{margin:0 0 14px;color:#64756d}
+.subjectHealthActions{display:flex;justify-content:flex-end;margin-top:12px}
+.subjectDemoBtn{width:100%;max-width:360px}
+@media(max-width:640px){.subjectHealthActions{justify-content:stretch}.subjectDemoBtn{max-width:none}}

@@ -18,9 +18,9 @@ import {
   $,
   show,
   esc
-} from './app.js?v=20260729-v5-1-syntax-root-fix';
+} from './app.js?v=20260729-v5-1-stable-master-loader';
 
-import * as Parser from './parser.js?v=20260729-v5-1-syntax-root-fix';
+import * as Parser from './parser.js?v=20260729-v5-1-stable-master-loader';
 
 // Parser compatibility layer: using a namespace import prevents the whole Create Exam
 // module from failing when GitHub temporarily serves an older parser.js that lacks one
@@ -530,7 +530,8 @@ function exportExamQualityReport() {
   const r = analyzeExamQuality();
   if (!r.total) { flash('Export చేయడానికి questions లేవు'); return; }
   const lines = ['KSR EXAM OS+ · PHASE 5 STEP 3 EXAM QUALITY REPORT', `Generated: ${new Date().toLocaleString()}`, '', `Certification: ${r.certification}`, `Overall Quality Score: ${r.overall}/100`, `Total Questions: ${r.total}`, '', 'QUALITY SCORES', ...Object.entries(r.scores).map(([k,v])=>`${k}: ${v}/100`), '', "BLOOM'S TAXONOMY ESTIMATE", ...Object.entries(r.bloom).map(([k,v])=>`${k}: ${v}`), '', 'SUGGESTIONS', ...r.suggestions.map((t,i)=>`${i+1}. ${t}`)];
-  const blob = new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'});
+  const blob = new Blob([lines.join('
+')], {type:'text/plain;charset=utf-8'});
   const url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url; a.download=`KSR-Exam-Quality-${Date.now()}.txt`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); flash('Exam Quality report downloaded ✅');
 }
 
@@ -939,6 +940,8 @@ function setMasterStatus(message, type = 'info') {
 async function loadMasters() {
   const instituteSelect = $('instituteId');
   const batchSelect = $('batchId');
+  const previousInstituteId = String(instituteSelect?.value || '').trim();
+  const previousBatchId = String(batchSelect?.value || '').trim();
   if (!instituteSelect || !batchSelect) {
     show('Create Exam select boxes missing. Page refresh cheyyandi.', 'err');
     return;
@@ -962,6 +965,10 @@ async function loadMasters() {
           .join('')
       : '<option value="">No institutes found</option>';
     instituteSelect.disabled = false;
+    const instituteToSelect = institutes.some(item => String(item.id) === previousInstituteId)
+      ? previousInstituteId
+      : (institutes.length === 1 ? String(institutes[0].id) : '');
+    instituteSelect.value = instituteToSelect;
 
     const batchResult = await loadCollectionReliable('batches');
     batches = batchResult.rows.filter(item => item.active !== false)
@@ -969,7 +976,13 @@ async function loadMasters() {
 
     batchSelect.disabled = false;
     renderBatchOptions();
+    const matchingBatches = batches.filter(batch => String(batch.instituteId || '').trim() === String(instituteSelect.value || '').trim());
+    const batchToSelect = matchingBatches.some(item => String(item.id) === previousBatchId)
+      ? previousBatchId
+      : (matchingBatches.length === 1 ? String(matchingBatches[0].id) : '');
+    batchSelect.value = batchToSelect;
     syncInstituteName();
+    await loadBatchStudents();
     updateCodeCount();
 
     const fallbackUsed = instituteResult.source !== 'Firebase SDK' || batchResult.source !== 'Firebase SDK';
@@ -1390,6 +1403,7 @@ function renderHealth() {
         <span>Confidence <b>${confidence}%</b></span>
       </div>
       ${issueButtons ? `<div class="subjectIssueLinks">${issueButtons}</div>` : ''}
+      ${list.length ? `<div class="subjectHealthActions"><button type="button" class="gray subjectDemoBtn" data-preview-subject="${subjectIndex}">${esc(subject.name || `Subject ${subjectIndex + 1}`)} Student View Demo</button></div>` : ''}
     </section>`;
   }).join('');
 
@@ -1407,7 +1421,7 @@ function renderHealth() {
   const backupCodes = Number($('backupCodeCount')?.value || 0);
   const importSummary = currentSubject().parserDiagnostics || lastImportSummary;
   const importSummaryHtml = importSummary ? `<section class="parserImportSummary">
-    <div class="parserSummaryHead"><b>Phase 2.2 Import Summary</b><span>${Number(importSummary.confidence || 0)}% confidence</span></div>
+    <div class="parserSummaryHead"><b>Parsed Questions Summary</b><span>${Number(importSummary.confidence || 0)}% confidence</span></div>
     <div class="parserSummaryGrid">
       <span>Detected <b>${Number(importSummary.parsedQuestions || 0)}</b></span>
       <span>Matching <b>${Number(importSummary.matchingQuestions || 0)}</b></span>
@@ -1421,7 +1435,7 @@ function renderHealth() {
   </section>` : '';
   $('health').innerHTML = `
     ${importSummaryHtml}
-    <div class="examHealthTitleRow"><b>Phase 4 · Parser Health Dashboard</b><span class="healthStatusBadge ${overallHealth.status.toLowerCase()}">${overallHealth.status}</span></div>
+    <div class="examHealthTitleRow"><b>Questions Health Card</b><span class="healthStatusBadge ${overallHealth.status.toLowerCase()}">${overallHealth.status}</span></div>
     <section class="healthScoreHero ${overallHealth.status.toLowerCase()}">
       <div class="healthScoreRing" style="--health-score:${overallHealth.healthScore}"><strong>${overallHealth.healthScore}%</strong><span>Health Score</span></div>
       <div class="healthHeroStats">
@@ -1495,6 +1509,23 @@ function renderHealth() {
           setTimeout(() => card.classList.remove('issueHere'), 3000);
         }
       }, 30);
+    };
+  });
+  document.querySelectorAll('.subjectDemoBtn').forEach(button => {
+    button.onclick = () => {
+      commitCurrentSubject();
+      const subjectIndex = Number(button.dataset.previewSubject || 0);
+      const subject = subjects[subjectIndex];
+      previewQuestions = (subject?.questions || []).map(question => ({
+        ...question,
+        subject: subject?.name || question.subject || 'General',
+        options: (question.options || []).map(option => ({ ...option }))
+      }));
+      if (!previewQuestions.length) return show('Ee subject lo preview questions levu.', 'err');
+      previewIndex = 0;
+      $('previewCard').hidden = false;
+      renderPreview();
+      $('previewCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
   });
   $('saveGenerateBtn').disabled = !allQuestions.length || Boolean(issues.length);

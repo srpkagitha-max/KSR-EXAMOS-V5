@@ -1,14 +1,5 @@
 {
-  "product": "KSR EXAM OS+",
-  "version": "5.1.0-sprint1",
-  "releaseDate": "2026-07-28",
-  "theme": "Green Edition",
-  "firebaseProjectId": "ksr-exam-os-v5",
-  "notes": [
-    "Firebase startup validation",
-    "Safer numbered-statement parsing",
-    "Parser regression diagnostics",
-    "PWA cache refresh",
-    "Mobile/accessibility polish"
-  ]
+  "version": "V5.1 Functional Health",
+  "build": "2026-07-29-functional-health",
+  "notes": "Active student auto-load, parser module restore, simplified health card, subject demo."
 }
