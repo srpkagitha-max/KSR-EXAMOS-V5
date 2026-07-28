@@ -18,9 +18,9 @@ import {
   $,
   show,
   esc
-} from './app.js?v=20260729-v5-1-stable-master-loader';
+} from './app.js?v=20260729-v5-1-core-runtime-fix';
 
-import * as Parser from './parser.js?v=20260729-v5-1-stable-master-loader';
+import * as Parser from './parser.js?v=20260729-v5-1-core-runtime-fix';
 
 // Parser compatibility layer: using a namespace import prevents the whole Create Exam
 // module from failing when GitHub temporarily serves an older parser.js that lacks one
@@ -243,14 +243,17 @@ function getAllQuestions() {
 }
 
 function validateQuestionList(list) {
-  const health = analyzeQuestionHealth(list);
+  const health = analyzeQuestionHealth(list) || {};
+  const reports = Array.isArray(health.questionHealth)
+    ? health.questionHealth
+    : (Array.isArray(health.questions) ? health.questions : []);
   const issues = [];
-  health.questions.forEach(report => {
+  reports.forEach(report => {
     const question = list[report.index] || {};
     const subjectIndex = Number.isInteger(question.subjectIndex) ? question.subjectIndex : activeSubjectIndex;
     const questionIndex = Number.isInteger(question.subjectQuestionIndex) ? question.subjectQuestionIndex : report.index;
     const label = question.subject ? `${question.subject} Q${questionIndex + 1}` : `Q${questionIndex + 1}`;
-    report.issues.forEach(issue => issues.push({
+    (Array.isArray(report.issues) ? report.issues : []).forEach(issue => issues.push({
       index: report.index,
       subjectIndex,
       questionIndex,

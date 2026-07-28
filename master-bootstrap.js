@@ -61,13 +61,15 @@ function renderBatches() {
 async function updateStudents() {
   const instituteId = String($('instituteId')?.value || '');
   const batchId = String($('batchId')?.value || '');
-  const active = $('activeStudents');
+  const active = $('activeStudentCount');
   if (!active) return;
   if (!instituteId || !batchId) { active.value = '0'; return; }
   try {
     const students = await fetchCollection('studentMaster');
-    const count = students.filter(s => String(s.instituteId || '') === instituteId && String(s.batchId || '') === batchId && s.active !== false && String(s.status || 'active').toLowerCase() !== 'inactive').length;
+    const count = students.filter(s => String(s.instituteId || '') === instituteId && String(s.batchId || '') === batchId && s.active !== false && !['inactive','hold','deleted'].includes(String(s.status || 'active').toLowerCase())).length;
     active.value = String(count);
+    const backup = Math.max(0, Number($('backupCodeCount')?.value || 10));
+    if ($('codeCount')) $('codeCount').value = String(count + backup);
     active.dispatchEvent(new Event('input', {bubbles:true}));
   } catch (error) {
     console.warn('[KSR bootstrap] student count failed', error);
@@ -109,8 +111,4 @@ $('refreshMastersBtn')?.addEventListener('click', loadMastersBootstrap);
 window.KSRBootstrapLoadMasters = loadMastersBootstrap;
 loadMastersBootstrap();
 
-// Load the full Create Exam module separately so an import/runtime failure is visible.
-import('./admin-daily.js?v=20260729-v5-1-bootstrap-debug').catch(error => {
-  console.error('[KSR] admin-daily module failed', error);
-  status(`Create Exam module error: ${error.message || error}`, 'err');
-});
+// admin-daily.js is loaded once by dashboard.html.

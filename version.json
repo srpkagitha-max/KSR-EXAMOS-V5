@@ -1,5 +1,10 @@
 {
-  "version": "V5.1 Functional Health",
-  "build": "2026-07-29-functional-health",
-  "notes": "Active student auto-load, parser module restore, simplified health card, subject demo."
+  "version": "5.1-core-runtime-fix",
+  "build": "20260729",
+  "fixes": [
+    "Parser module startup crash fixed",
+    "Active student counter field fixed",
+    "Duplicate admin module import removed",
+    "Cache version refreshed"
+  ]
 }
