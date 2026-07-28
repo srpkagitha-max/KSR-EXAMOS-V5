@@ -711,11 +711,19 @@ onAuthStateChanged(auth, async u => {
   }
 
   user = u;
-  setDefaultTimes();
-  clearCreateForm(false);
-  loadActiveSubject();
-  restoreGeneratedCodes();
+
+  // Master data is essential for Create Exam. Load it first so an optional
+  // analytics/editor widget error can never leave Institute and Batch blank.
   await loadMasters();
+
+  const safeInit = (label, fn) => {
+    try { fn(); }
+    catch (error) { console.error(`[KSR init] ${label} failed:`, error); }
+  };
+  safeInit('default times', setDefaultTimes);
+  safeInit('fresh form', () => clearCreateForm(false));
+  safeInit('active subject', loadActiveSubject);
+  safeInit('generated codes', restoreGeneratedCodes);
 });
 
 $('logout')?.addEventListener('click', () => signOut(auth));
@@ -818,9 +826,10 @@ function clearCreateForm(showNotice = true) {
   }
 }
 
-window.addEventListener('ksr:new-exam', () => {
+window.addEventListener('ksr:new-exam', async () => {
   clearCreateForm(false);
   loadActiveSubject();
+  if (user) await loadMasters();
 });
 
 $('clearExamFormBtn')?.addEventListener('click', () => {
@@ -871,6 +880,7 @@ async function loadMasters() {
 
   instituteSelect.innerHTML = '<option value="">Loading institutes...</option>';
   batchSelect.innerHTML = '<option value="">Loading batches...</option>';
+  if ($('mastersStatus')) { $('mastersStatus').className = 'msg warn'; $('mastersStatus').textContent = 'Institute / Batch data loading…'; }
 
   try {
     const [instituteSnapshot, batchSnapshot] = await Promise.all([
@@ -905,12 +915,14 @@ async function loadMasters() {
     updateCodeCount();
 
     const summary = `${institutes.length} institutes, ${batches.length} batches loaded ✅`;
+    if ($('mastersStatus')) { $('mastersStatus').className = 'msg ok'; $('mastersStatus').textContent = summary; }
     flash(summary);
     console.info('[KSR Create Exam]', summary, { institutes, batches });
   } catch (error) {
     console.error('Institute/Batch load failed:', error);
     instituteSelect.innerHTML = '<option value="">Institute load failed — tap Refresh Masters</option>';
     batchSelect.innerHTML = '<option value="">Batch load failed</option>';
+    if ($('mastersStatus')) { $('mastersStatus').className = 'msg err'; $('mastersStatus').textContent = 'Institute/Batch load failed: ' + (error?.message || error); }
     show('Institute/Batch load avvaledu: ' + (error?.message || error), 'err');
   }
 }

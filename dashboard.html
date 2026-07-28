@@ -1,7 +1,7 @@
 <!doctype html><html lang="te"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0"><title>KSR EXAM OS+ Admin</title><link rel="stylesheet" href="style.css?v=20260728-v5-1-sprint1">
+<meta http-equiv="Expires" content="0"><title>KSR EXAM OS+ Admin</title><link rel="stylesheet" href="style.css?v=20260729-v5-1-masters-hotfix2">
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#16865a">
 <meta name="mobile-web-app-capable" content="yes">
@@ -31,8 +31,9 @@
 <section id="examPanel" class="adminWorkPanel" hidden>
 <button class="backHomeBtn" type="button">← Main Features</button>
 <div class="card"><div class="sectionHeadRow"><div><h2>Create Daily Exam</h2><p class="small">Fresh exam form. Old exam data automatic ga load avvadu.</p></div><div class="action-row compact"><button type="button" class="gray" id="recoverDraftBtn">Recover Draft</button><button type="button" class="danger" id="clearExamFormBtn">Clear Form</button></div></div><div class="grid two">
-<div><label>Institute</label><select id="instituteId"></select><input id="instituteName" type="hidden"></div>
-<div><label>Batch</label><select id="batchId"></select></div>
+<div><label>Institute</label><select id="instituteId"><option value="">Loading institutes...</option></select><input id="instituteName" type="hidden"></div>
+<div><label>Batch</label><select id="batchId"><option value="">Select institute first</option></select></div>
+<div class="masterReloadRow"><button type="button" class="gray" id="refreshMastersBtn">↻ Refresh Institute / Batch</button><div id="mastersStatus" class="msg warn">Institute / Batch data loading…</div></div>
 <div><label>Exam ID</label><input id="examId" placeholder="TEST-101"></div>
 <div><label>Exam Name (optional)</label><input id="examTitle" placeholder="Daily Grand Test"></div>
 <div><label>Active Students</label><input id="activeStudentCount" type="number" value="0" readonly></div>
@@ -190,6 +191,6 @@
  document.querySelectorAll('.backHomeBtn').forEach(b=>b.addEventListener('click',()=>{panels.forEach(p=>p.hidden=true);home.hidden=false;window.scrollTo({top:0,behavior:'smooth'});}));
 })();
 </script>
-<script type="module" src="admin-daily.js?v=20260728-v5-1-masters-hotfix1"></script>
-<script src="./pwa-register.js?v=20260728-v5-1-sprint1"></script>
+<script type="module" src="admin-daily.js?v=20260729-v5-1-masters-hotfix2"></script>
+<script src="./pwa-register.js?v=20260729-v5-1-masters-hotfix2"></script>
 </body></html>

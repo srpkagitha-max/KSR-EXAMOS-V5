@@ -780,3 +780,5 @@ textarea{line-height:1.55;resize:vertical}
 .diagnosticItem p{white-space:normal}
 .ksrVersionBadge{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;background:#e9f8f0;color:#146543;border:1px solid #c7e7d5;font-size:11px;font-weight:850}
 @media(max-width:600px){.adminTopbar{position:relative}.examBody .option,.examBody .opt{min-height:52px}.diagnosticSummary{display:grid;grid-template-columns:repeat(3,1fr)}}
+
+.masterReloadRow{grid-column:1/-1;display:grid;gap:10px;align-items:center}.masterReloadRow .msg{margin:0;padding:12px 14px}.masterReloadRow button{width:100%}@media(min-width:700px){.masterReloadRow{grid-template-columns:auto 1fr}.masterReloadRow button{width:auto}}
