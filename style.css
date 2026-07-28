@@ -781,4 +781,5 @@ textarea{line-height:1.55;resize:vertical}
 .ksrVersionBadge{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;background:#e9f8f0;color:#146543;border:1px solid #c7e7d5;font-size:11px;font-weight:850}
 @media(max-width:600px){.adminTopbar{position:relative}.examBody .option,.examBody .opt{min-height:52px}.diagnosticSummary{display:grid;grid-template-columns:repeat(3,1fr)}}
 
-.masterReloadRow{grid-column:1/-1;display:grid;gap:10px;align-items:center}.masterReloadRow .msg{margin:0;padding:12px 14px}.masterReloadRow button{width:100%}@media(min-width:700px){.masterReloadRow{grid-template-columns:auto 1fr}.masterReloadRow button{width:auto}}
+/* V5.1 Stable Master Loader */
+.masterReloadRow{grid-column:1/-1;display:grid;gap:10px;margin-top:-4px}.masterReloadRow button{width:100%}.masterLoadStatus{padding:12px 14px;border-radius:14px;background:#fff7ed;border-left:5px solid #f97316;font-weight:800;color:#23463a}.masterLoadStatus.loading{background:#fff7ed;border-color:#f97316}.masterLoadStatus.ok{background:#ecfdf5;border-color:#16a34a;color:#166534}.masterLoadStatus.err{background:#fef2f2;border-color:#dc2626;color:#991b1b}select:disabled{opacity:.72;cursor:wait}

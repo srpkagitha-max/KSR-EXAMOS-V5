@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ksr-exam-os-v5-1-masters-hotfix2-20260729';
+const CACHE_NAME = 'ksr-exam-os-v5-1-stable-master-loader-20260729';
 const APP_SHELL = [
   './offline.html', './manifest.json', './icon-192.png', './icon-512.png'
 ];

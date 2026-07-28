@@ -18,9 +18,9 @@ import {
   $,
   show,
   esc
-} from './app.js?v=20260728-v5-1-masters-hotfix1';
+} from './app.js?v=20260729-v5-1-stable-master-loader';
 
-import * as Parser from './parser.js?v=20260728-v5-1-masters-hotfix1';
+import * as Parser from './parser.js?v=20260729-v5-1-stable-master-loader';
 
 // Parser compatibility layer: using a namespace import prevents the whole Create Exam
 // module from failing when GitHub temporarily serves an older parser.js that lacks one
@@ -711,19 +711,11 @@ onAuthStateChanged(auth, async u => {
   }
 
   user = u;
-
-  // Master data is essential for Create Exam. Load it first so an optional
-  // analytics/editor widget error can never leave Institute and Batch blank.
+  setDefaultTimes();
+  clearCreateForm(false);
+  loadActiveSubject();
+  restoreGeneratedCodes();
   await loadMasters();
-
-  const safeInit = (label, fn) => {
-    try { fn(); }
-    catch (error) { console.error(`[KSR init] ${label} failed:`, error); }
-  };
-  safeInit('default times', setDefaultTimes);
-  safeInit('fresh form', () => clearCreateForm(false));
-  safeInit('active subject', loadActiveSubject);
-  safeInit('generated codes', restoreGeneratedCodes);
 });
 
 $('logout')?.addEventListener('click', () => signOut(auth));
@@ -826,10 +818,9 @@ function clearCreateForm(showNotice = true) {
   }
 }
 
-window.addEventListener('ksr:new-exam', async () => {
+window.addEventListener('ksr:new-exam', () => {
   clearCreateForm(false);
   loadActiveSubject();
-  if (user) await loadMasters();
 });
 
 $('clearExamFormBtn')?.addEventListener('click', () => {
@@ -870,6 +861,82 @@ $('backupCodeCount')?.addEventListener('input', () => {
 });
 $('secondsPerQuestion')?.addEventListener('input', scheduleHealth);
 
+const MASTER_LOAD_TIMEOUT_MS = 9000;
+
+function withTimeout(promise, ms, label) {
+  let timer;
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error(`${label} timed out after ${Math.round(ms / 1000)}s`)), ms);
+    })
+  ]).finally(() => clearTimeout(timer));
+}
+
+function decodeFirestoreValue(value) {
+  if (!value || typeof value !== 'object') return value;
+  if ('stringValue' in value) return value.stringValue;
+  if ('booleanValue' in value) return value.booleanValue;
+  if ('integerValue' in value) return Number(value.integerValue);
+  if ('doubleValue' in value) return Number(value.doubleValue);
+  if ('timestampValue' in value) return value.timestampValue;
+  if ('nullValue' in value) return null;
+  if ('referenceValue' in value) return value.referenceValue;
+  if ('arrayValue' in value) return (value.arrayValue.values || []).map(decodeFirestoreValue);
+  if ('mapValue' in value) return decodeFirestoreFields(value.mapValue.fields || {});
+  return value;
+}
+
+function decodeFirestoreFields(fields = {}) {
+  return Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, decodeFirestoreValue(value)]));
+}
+
+async function loadCollectionViaRest(collectionName) {
+  const cfg = window.KSR_FIREBASE_CONFIG || {};
+  if (!cfg.projectId || !cfg.apiKey) throw new Error('Firebase REST configuration missing');
+  const url = `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(cfg.projectId)}/databases/(default)/documents/${encodeURIComponent(collectionName)}?pageSize=1000&key=${encodeURIComponent(cfg.apiKey)}`;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), MASTER_LOAD_TIMEOUT_MS);
+  try {
+    const response = await fetch(url, { cache: 'no-store', signal: controller.signal });
+    if (!response.ok) {
+      const body = await response.text().catch(() => '');
+      throw new Error(`REST ${collectionName} failed (${response.status}) ${body.slice(0, 140)}`);
+    }
+    const payload = await response.json();
+    return (payload.documents || []).map(item => ({
+      id: String(item.name || '').split('/').pop(),
+      ...decodeFirestoreFields(item.fields || {})
+    }));
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function loadCollectionReliable(collectionName) {
+  try {
+    const snapshot = await withTimeout(
+      getDocs(collection(db, collectionName)),
+      MASTER_LOAD_TIMEOUT_MS,
+      collectionName
+    );
+    const rows = [];
+    snapshot.forEach(documentSnapshot => rows.push({ id: documentSnapshot.id, ...(documentSnapshot.data() || {}) }));
+    return { rows, source: 'Firebase SDK' };
+  } catch (sdkError) {
+    console.warn(`[KSR] ${collectionName} SDK load failed; trying REST fallback`, sdkError);
+    const rows = await loadCollectionViaRest(collectionName);
+    return { rows, source: 'REST fallback', sdkError };
+  }
+}
+
+function setMasterStatus(message, type = 'info') {
+  const box = $('masterLoadStatus');
+  if (!box) return;
+  box.className = `masterLoadStatus ${type}`;
+  box.textContent = message;
+}
+
 async function loadMasters() {
   const instituteSelect = $('instituteId');
   const batchSelect = $('batchId');
@@ -878,52 +945,48 @@ async function loadMasters() {
     return;
   }
 
+  instituteSelect.disabled = true;
+  batchSelect.disabled = true;
   instituteSelect.innerHTML = '<option value="">Loading institutes...</option>';
-  batchSelect.innerHTML = '<option value="">Loading batches...</option>';
-  if ($('mastersStatus')) { $('mastersStatus').className = 'msg warn'; $('mastersStatus').textContent = 'Institute / Batch data loading…'; }
+  batchSelect.innerHTML = '<option value="">Select institute first</option>';
+  setMasterStatus('Institute / Batch data loading...', 'loading');
 
   try {
-    const [instituteSnapshot, batchSnapshot] = await Promise.all([
-      getDocs(collection(db, 'institutes')),
-      getDocs(collection(db, 'batches'))
-    ]);
-
-    institutes = [];
-    batches = [];
-
-    instituteSnapshot.forEach(documentSnapshot => {
-      const data = documentSnapshot.data() || {};
-      institutes.push({ id: documentSnapshot.id, ...data });
-    });
-
-    batchSnapshot.forEach(documentSnapshot => {
-      const data = documentSnapshot.data() || {};
-      batches.push({ id: documentSnapshot.id, ...data });
-    });
-
-    institutes.sort((a, b) => String(a.name || a.instituteName || '').localeCompare(String(b.name || b.instituteName || '')));
-    batches.sort((a, b) => String(a.name || a.batchName || '').localeCompare(String(b.name || b.batchName || '')));
+    // Sequential loading avoids a mobile WebChannel stall in Promise.all.
+    const instituteResult = await loadCollectionReliable('institutes');
+    institutes = instituteResult.rows.filter(item => item.active !== false);
 
     instituteSelect.innerHTML = institutes.length
       ? '<option value="">Select Institute</option>' + institutes
+          .sort((a, b) => String(a.name || a.instituteName || '').localeCompare(String(b.name || b.instituteName || '')))
           .map(institute => `<option value="${esc(institute.id)}">${esc(institute.name || institute.instituteName || 'Institute')}</option>`)
           .join('')
       : '<option value="">No institutes found</option>';
+    instituteSelect.disabled = false;
 
+    const batchResult = await loadCollectionReliable('batches');
+    batches = batchResult.rows.filter(item => item.active !== false)
+      .sort((a, b) => String(a.name || a.batchName || '').localeCompare(String(b.name || b.batchName || '')));
+
+    batchSelect.disabled = false;
     renderBatchOptions();
     syncInstituteName();
     updateCodeCount();
 
-    const summary = `${institutes.length} institutes, ${batches.length} batches loaded ✅`;
-    if ($('mastersStatus')) { $('mastersStatus').className = 'msg ok'; $('mastersStatus').textContent = summary; }
+    const fallbackUsed = instituteResult.source !== 'Firebase SDK' || batchResult.source !== 'Firebase SDK';
+    const summary = `${institutes.length} institute, ${batches.length} batch loaded ✅${fallbackUsed ? ' (fallback)' : ''}`;
+    setMasterStatus(summary, 'ok');
     flash(summary);
-    console.info('[KSR Create Exam]', summary, { institutes, batches });
+    console.info('[KSR Create Exam]', summary, { institutes, batches, instituteResult, batchResult });
   } catch (error) {
     console.error('Institute/Batch load failed:', error);
-    instituteSelect.innerHTML = '<option value="">Institute load failed — tap Refresh Masters</option>';
+    instituteSelect.disabled = false;
+    batchSelect.disabled = false;
+    instituteSelect.innerHTML = '<option value="">Institute load failed — tap Refresh</option>';
     batchSelect.innerHTML = '<option value="">Batch load failed</option>';
-    if ($('mastersStatus')) { $('mastersStatus').className = 'msg err'; $('mastersStatus').textContent = 'Institute/Batch load failed: ' + (error?.message || error); }
-    show('Institute/Batch load avvaledu: ' + (error?.message || error), 'err');
+    const message = `Institute/Batch load failed: ${error?.message || error}`;
+    setMasterStatus(message, 'err');
+    show(message, 'err');
   }
 }
 
@@ -969,22 +1032,20 @@ async function loadBatchStudents() {
   updateCodeCount();
   if (!instituteId || !batchId) return;
   try {
-    // Fetch-all + client filter avoids composite-index/rules mismatch and supports old student records.
-    const snapshot = await getDocs(collection(db, 'studentMaster'));
-    snapshot.forEach(documentSnapshot => {
-      const data = documentSnapshot.data() || {};
+    const result = await loadCollectionReliable('studentMaster');
+    result.rows.forEach(data => {
       const sameBatch = String(data.batchId || '') === String(batchId);
       const sameInstitute = !data.instituteId || String(data.instituteId) === String(instituteId);
       const status = String(data.status || '').toLowerCase();
       const isActive = data.active !== false && !['hold','inactive','deleted'].includes(status);
-      if (sameBatch && sameInstitute && isActive) batchStudents.push({ id: documentSnapshot.id, ...data });
+      if (sameBatch && sameInstitute && isActive) batchStudents.push(data);
     });
     batchStudents.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
     updateCodeCount();
     flash(`${batchStudents.length} active students loaded + ${Number($('backupCodeCount')?.value || 10)} backup codes`);
   } catch (error) {
     updateCodeCount();
-    show('Students load avvaledu: ' + error.message, 'err');
+    show('Students load avvaledu: ' + (error?.message || error), 'err');
   }
 }
 
