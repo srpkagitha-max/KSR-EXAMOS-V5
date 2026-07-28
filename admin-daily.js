@@ -18,9 +18,9 @@ import {
   $,
   show,
   esc
-} from './app.js?v=20260727-stage3-clean-core';
+} from './app.js?v=20260728-v5-1-masters-hotfix1';
 
-import * as Parser from './parser.js?v=20260727-stage3-clean-core';
+import * as Parser from './parser.js?v=20260728-v5-1-masters-hotfix1';
 
 // Parser compatibility layer: using a namespace import prevents the whole Create Exam
 // module from failing when GitHub temporarily serves an older parser.js that lacks one
@@ -245,7 +245,7 @@ function getAllQuestions() {
 function validateQuestionList(list) {
   const health = analyzeQuestionHealth(list);
   const issues = [];
-  (health.questions || []).forEach(report => {
+  health.questions.forEach(report => {
     const question = list[report.index] || {};
     const subjectIndex = Number.isInteger(question.subjectIndex) ? question.subjectIndex : activeSubjectIndex;
     const questionIndex = Number.isInteger(question.subjectQuestionIndex) ? question.subjectQuestionIndex : report.index;
@@ -711,22 +711,22 @@ onAuthStateChanged(auth, async u => {
   }
 
   user = u;
-  try {
-    setDefaultTimes();
-    clearCreateForm(false);
-    loadActiveSubject();
-    restoreGeneratedCodes();
-    await loadMasters();
-    window.__KSR_ADMIN_READY__ = true;
-    show('Admin modules ready ✅');
-  } catch (error) {
-    console.error('Admin initialization failed:', error);
-    window.__KSR_ADMIN_READY__ = false;
-    show('Admin initialization error: ' + (error?.message || error), 'err');
-  }
+  setDefaultTimes();
+  clearCreateForm(false);
+  loadActiveSubject();
+  restoreGeneratedCodes();
+  await loadMasters();
 });
 
 $('logout')?.addEventListener('click', () => signOut(auth));
+
+window.addEventListener('pageshow', event => {
+  if (user && (event.persisted || !$('instituteId')?.options?.length)) loadMasters();
+});
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && user && $('instituteId')?.options?.length <= 1) loadMasters();
+});
+$('refreshMastersBtn')?.addEventListener('click', loadMasters);
 
 $('instituteId')?.addEventListener('change', async () => {
   batchStudents = [];
@@ -862,6 +862,16 @@ $('backupCodeCount')?.addEventListener('input', () => {
 $('secondsPerQuestion')?.addEventListener('input', scheduleHealth);
 
 async function loadMasters() {
+  const instituteSelect = $('instituteId');
+  const batchSelect = $('batchId');
+  if (!instituteSelect || !batchSelect) {
+    show('Create Exam select boxes missing. Page refresh cheyyandi.', 'err');
+    return;
+  }
+
+  instituteSelect.innerHTML = '<option value="">Loading institutes...</option>';
+  batchSelect.innerHTML = '<option value="">Loading batches...</option>';
+
   try {
     const [instituteSnapshot, batchSnapshot] = await Promise.all([
       getDocs(collection(db, 'institutes')),
@@ -872,43 +882,47 @@ async function loadMasters() {
     batches = [];
 
     instituteSnapshot.forEach(documentSnapshot => {
-      institutes.push({
-        id: documentSnapshot.id,
-        ...documentSnapshot.data()
-      });
+      const data = documentSnapshot.data() || {};
+      institutes.push({ id: documentSnapshot.id, ...data });
     });
 
     batchSnapshot.forEach(documentSnapshot => {
-      batches.push({
-        id: documentSnapshot.id,
-        ...documentSnapshot.data()
-      });
+      const data = documentSnapshot.data() || {};
+      batches.push({ id: documentSnapshot.id, ...data });
     });
 
-    institutes.sort((a, b) =>
-      String(a.name || '').localeCompare(String(b.name || ''))
-    );
+    institutes.sort((a, b) => String(a.name || a.instituteName || '').localeCompare(String(b.name || b.instituteName || '')));
+    batches.sort((a, b) => String(a.name || a.batchName || '').localeCompare(String(b.name || b.batchName || '')));
 
-    if (!$('instituteId') || !$('batchId')) throw new Error('Create Exam select boxes missing');
-    $('instituteId').innerHTML = institutes.length
+    instituteSelect.innerHTML = institutes.length
       ? '<option value="">Select Institute</option>' + institutes
-          .map(institute => `<option value="${institute.id}">${esc(institute.name || 'Institute')}</option>`)
+          .map(institute => `<option value="${esc(institute.id)}">${esc(institute.name || institute.instituteName || 'Institute')}</option>`)
           .join('')
-      : '<option value="">No institutes found — add in Institute & Batch Master</option>';
+      : '<option value="">No institutes found</option>';
 
     renderBatchOptions();
     syncInstituteName();
-    await loadBatchStudents();
+    updateCodeCount();
+
+    const summary = `${institutes.length} institutes, ${batches.length} batches loaded ✅`;
+    flash(summary);
+    console.info('[KSR Create Exam]', summary, { institutes, batches });
   } catch (error) {
-    show('Institute/Batch load avvaledu: ' + error.message, 'err');
+    console.error('Institute/Batch load failed:', error);
+    instituteSelect.innerHTML = '<option value="">Institute load failed — tap Refresh Masters</option>';
+    batchSelect.innerHTML = '<option value="">Batch load failed</option>';
+    show('Institute/Batch load avvaledu: ' + (error?.message || error), 'err');
   }
 }
 
+// Public retry hook used by the visible Refresh Masters button and mobile page restore.
+window.KSRReloadMasters = loadMasters;
+
 function renderBatchOptions() {
-  const instituteId = $('instituteId').value;
+  const instituteId = String($('instituteId')?.value || '').trim();
 
   const filteredBatches = batches.filter(
-    batch => batch.instituteId === instituteId
+    batch => String(batch.instituteId || '').trim() === instituteId
   );
 
   if (!$('batchId')) return;
@@ -933,7 +947,7 @@ function syncInstituteName() {
     institute => institute.id === $('instituteId').value
   );
 
-  $('instituteName').value = selectedInstitute?.name || '';
+  if ($('instituteName')) $('instituteName').value = selectedInstitute?.name || selectedInstitute?.instituteName || '';
 }
 
 async function loadBatchStudents() {
@@ -1257,7 +1271,7 @@ function exportHealthReport(allQuestions, health, issues) {
   if (!issues.length) lines.push('No issues found. All questions are healthy.');
   issues.forEach((issue, index) => lines.push(`${index + 1}. [${issue.severity.toUpperCase()}] ${issue.text} (${healthIssueLabel(issue.type)})`));
   lines.push('', 'QUESTION SCORES');
-  (health.questions || []).forEach(report => {
+  health.questions.forEach(report => {
     const question = allQuestions[report.index] || {};
     const subject = question.subject || 'General';
     const qNo = Number(question.subjectQuestionIndex ?? report.index) + 1;
@@ -2230,7 +2244,7 @@ async function restoreBackupFile(file) {
 $('saveGenerateBtn')?.addEventListener('click', async () => {
   const allQuestions = getAllQuestions();
 
-  const instituteId = $('instituteId').value;
+  const instituteId = String($('instituteId')?.value || '').trim();
   const batchId = $('batchId').value;
 
   const instituteName =
