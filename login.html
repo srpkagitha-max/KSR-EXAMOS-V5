@@ -1,15 +1,29 @@
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0"><title>KSR Login</title><link rel="stylesheet" href="style.css?v=20260728-v5-1-sprint1">
-<link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#16865a">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="KSR EXAM OS+">
-<link rel="apple-touch-icon" href="./icon-192.png">
-<link rel="icon" type="image/png" href="./favicon.png">
-</head><body><div class="hero brandHero"><img class="brandHeroIcon" src="icon-192.png" alt="KSR EXAM OS+"><h1>KSR EXAM OS+</h1><p>Smart • Secure • Scalable</p><strong>Admin Login</strong><div class="nav"><a class="btn gray" href="index.html">Student</a><a class="btn gray" href="create-admin.html">Create Admin</a></div></div><div class="wrap"><div class="card"><h2>Admin Login</h2><div id="msg"></div><label>Email</label><input id="email" placeholder="admin@gmail.com"><label>Password</label><input id="pass" type="password"><button id="login">Login</button></div></div><script type="module">import{auth,signInWithEmailAndPassword,$,show}from'./app.js';$('login').onclick=async()=>{try{await signInWithEmailAndPassword(auth,$('email').value.trim(),$('pass').value);location.href='dashboard.html'}catch(e){show(e.message,'err')}};</script>
-<script src="./pwa-register.js?v=20260728-v5-1-sprint1"></script>
-</body></html>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
+<title>KSR Login</title><link rel="stylesheet" href="style.css?v=20260728-v51-authfix"><link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#16865a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="KSR EXAM OS+">
+<link rel="apple-touch-icon" href="./icon-192.png"><link rel="icon" type="image/png" href="./favicon.png">
+</head><body><div class="hero brandHero"><img class="brandHeroIcon" src="icon-192.png" alt="KSR EXAM OS+"><h1>KSR EXAM OS+</h1><p>Smart • Secure • Scalable</p><strong>Admin Login</strong><div class="nav"><a class="btn gray" href="index.html">Student</a><a class="btn gray" href="create-admin.html">Create Admin</a></div></div>
+<div class="wrap"><div class="card"><h2>Admin Login</h2><div id="msg"></div><label>Email</label><input id="email" type="email" autocomplete="username" placeholder="admin@gmail.com"><label>Password</label><input id="pass" type="password" autocomplete="current-password"><button id="login">Login</button></div></div>
+<script type="module">
+import{auth,db,signInWithEmailAndPassword,signOut,doc,getDoc,$,show}from'./app.js?v=20260728-v51-authfix';
+const params=new URLSearchParams(location.search);const saved=params.get('email')||sessionStorage.getItem('ksrAdminCreatedEmail')||'';if(saved)$('email').value=saved;
+if(params.get('created')==='1')show('Admin create అయింది ✅ ఇప్పుడు అదే passwordతో Login చేయండి.');
+function friendly(code){const map={
+ 'auth/invalid-credential':'Email లేదా Password తప్పుగా ఉంది. పాత fake email account password తెలియకపోతే Firebase Authenticationలో ఆ accountను Delete చేసి Create Admin ద్వారా మళ్లీ create చేయండి.',
+ 'auth/invalid-email':'సరైన email నమోదు చేయండి.','auth/user-disabled':'ఈ account disable చేయబడింది.','auth/too-many-requests':'ఎక్కువ login attempts అయ్యాయి. కొంతసేపటి తర్వాత ప్రయత్నించండి.','auth/network-request-failed':'Internet connection తనిఖీ చేయండి.'};return map[code]||'Login కాలేదు. మళ్లీ ప్రయత్నించండి.';}
+const btn=$('login');
+async function doLogin(){
+ const email=$('email').value.trim().toLowerCase(),password=$('pass').value;if(!email||!password){show('Email మరియు Password నమోదు చేయండి.','err');return;}
+ btn.disabled=true;btn.textContent='Logging in...';
+ try{
+  const cred=await signInWithEmailAndPassword(auth,email,password);
+  const adminSnap=await getDoc(doc(db,'admins',cred.user.uid));
+  if(!adminSnap.exists()||adminSnap.data()?.active===false){await signOut(auth);show('ఈ accountకు Admin profile లేదు. Create Admin page ద్వారా account create చేయండి.','err');return;}
+  sessionStorage.removeItem('ksrAdminCreatedEmail');location.replace('dashboard.html');
+ }catch(e){show(friendly(e.code),'err');}
+ finally{btn.disabled=false;btn.textContent='Login';}
+}
+btn.onclick=doLogin;$('pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+</script><script src="./pwa-register.js?v=20260728-v51-authfix"></script></body></html>

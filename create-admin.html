@@ -1,15 +1,54 @@
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0"><title>Create Admin</title><link rel="stylesheet" href="style.css?v=20260728-v5-1-sprint1">
-<link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#16865a">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="KSR EXAM OS+">
-<link rel="apple-touch-icon" href="./icon-192.png">
-<link rel="icon" type="image/png" href="./favicon.png">
-</head><body><div class="hero"><h1>KSR EXAM OS+ Admin Setup</h1><p>First admin account</p><div class="nav"><a class="btn gray" href="login.html">Login</a></div></div><div class="wrap"><div class="card"><h2>Create First Admin</h2><div id="msg"></div><label>Email</label><input id="email" placeholder="admin@gmail.com"><label>Password</label><input id="pass" type="password" placeholder="minimum 6 chars"><label>Name</label><input id="name" value="KSR Admin"><button class="green" id="create">Create Admin</button><p class="msg warn">ఒక్కసారి admin create అయిన తర్వాత login.html లో login చేయండి.</p></div></div><script type="module">import{auth,db,createUserWithEmailAndPassword,doc,setDoc,serverTimestamp,$,show}from'./app.js';$('create').onclick=async()=>{try{const u=await createUserWithEmailAndPassword(auth,$('email').value.trim(),$('pass').value);await setDoc(doc(db,'admins',u.user.uid),{email:$('email').value.trim(),name:$('name').value||'KSR Admin',role:'superAdmin',createdAt:serverTimestamp()});show('Admin created successfully ✅');}catch(e){show(e.message,'err')}};</script>
-<script src="./pwa-register.js?v=20260728-v5-1-sprint1"></script>
-</body></html>
+<meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
+<title>Create Admin</title><link rel="stylesheet" href="style.css?v=20260728-v51-authfix">
+<link rel="manifest" href="./manifest.json"><meta name="theme-color" content="#16865a">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="KSR EXAM OS+">
+<link rel="apple-touch-icon" href="./icon-192.png"><link rel="icon" type="image/png" href="./favicon.png">
+</head><body>
+<div class="hero"><h1>KSR EXAM OS+ Admin Setup</h1><p>First admin account</p><div class="nav"><a class="btn gray" href="login.html">Login</a></div></div>
+<div class="wrap"><div class="card"><h2>Create First Admin</h2><div id="msg"></div>
+<label>Email</label><input id="email" type="email" autocomplete="username" placeholder="admin@gmail.com">
+<label>Password</label><input id="pass" type="password" autocomplete="new-password" placeholder="minimum 6 characters">
+<label>Name</label><input id="name" value="KSR Admin" maxlength="80">
+<button class="green" id="create">Create Admin</button>
+<p class="msg warn">Admin create అయిన తర్వాత ఇదే email, passwordతో Login చేయండి.</p></div></div>
+<script type="module">
+import{auth,db,createUserWithEmailAndPassword,deleteUser,signOut,doc,setDoc,serverTimestamp,$,show}from'./app.js?v=20260728-v51-authfix';
+const btn=$('create');
+function friendly(code){
+ const map={
+  'auth/email-already-in-use':'ఈ emailతో account ఇప్పటికే ఉంది. Firebase Authenticationలో పాత accountను Delete చేసి మళ్లీ Create Admin చేయండి లేదా వేరే email వాడండి.',
+  'auth/invalid-email':'సరైన email address నమోదు చేయండి.',
+  'auth/weak-password':'Password కనీసం 6 అక్షరాలు ఉండాలి.',
+  'auth/network-request-failed':'Internet connection తనిఖీ చేసి మళ్లీ ప్రయత్నించండి.'
+ };
+ return map[code]||'Admin create కాలేదు. మళ్లీ ప్రయత్నించండి.';
+}
+btn.onclick=async()=>{
+ const email=$('email').value.trim().toLowerCase();
+ const password=$('pass').value;
+ const name=$('name').value.trim()||'KSR Admin';
+ if(!email){show('Email నమోదు చేయండి.','err');return;}
+ if(password.length<6){show('Password కనీసం 6 అక్షరాలు ఉండాలి.','err');return;}
+ btn.disabled=true;btn.textContent='Creating...';
+ let user=null;
+ try{
+  const cred=await createUserWithEmailAndPassword(auth,email,password); user=cred.user;
+  try{
+   await setDoc(doc(db,'admins',user.uid),{email,name,role:'superAdmin',active:true,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+  }catch(dbErr){
+   try{await deleteUser(user)}catch(_){ }
+   throw new Error('AUTH_CREATED_BUT_PROFILE_FAILED');
+  }
+  await signOut(auth);
+  sessionStorage.setItem('ksrAdminCreatedEmail',email);
+  show('Admin విజయవంతంగా create అయింది ✅ Login pageకి వెళ్తోంది...');
+  setTimeout(()=>location.href='login.html?created=1&email='+encodeURIComponent(email),900);
+ }catch(e){
+  if(e.message==='AUTH_CREATED_BUT_PROFILE_FAILED') show('Admin profile save కాలేదు. Firestore Rules తనిఖీ చేసి మళ్లీ ప్రయత్నించండి. Auth account rollback చేయబడింది.','err');
+  else show(friendly(e.code),'err');
+ }finally{btn.disabled=false;btn.textContent='Create Admin';}
+};
+</script><script src="./pwa-register.js?v=20260728-v51-authfix"></script></body></html>
