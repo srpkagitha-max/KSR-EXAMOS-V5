@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ksr-exam-os-v5-1-syntax-root-fix-20260729';
+const CACHE_NAME = 'ksr-exam-os-v5-1-bootstrap-debug-20260729';
 const APP_SHELL = [
   './offline.html', './manifest.json', './icon-192.png', './icon-512.png'
 ];
