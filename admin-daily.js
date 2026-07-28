@@ -18,9 +18,9 @@ import {
   $,
   show,
   esc
-} from './app.js?v=20260729-v5-1-stable-master-loader';
+} from './app.js?v=20260729-v5-1-syntax-root-fix';
 
-import * as Parser from './parser.js?v=20260729-v5-1-stable-master-loader';
+import * as Parser from './parser.js?v=20260729-v5-1-syntax-root-fix';
 
 // Parser compatibility layer: using a namespace import prevents the whole Create Exam
 // module from failing when GitHub temporarily serves an older parser.js that lacks one
@@ -530,8 +530,7 @@ function exportExamQualityReport() {
   const r = analyzeExamQuality();
   if (!r.total) { flash('Export చేయడానికి questions లేవు'); return; }
   const lines = ['KSR EXAM OS+ · PHASE 5 STEP 3 EXAM QUALITY REPORT', `Generated: ${new Date().toLocaleString()}`, '', `Certification: ${r.certification}`, `Overall Quality Score: ${r.overall}/100`, `Total Questions: ${r.total}`, '', 'QUALITY SCORES', ...Object.entries(r.scores).map(([k,v])=>`${k}: ${v}/100`), '', "BLOOM'S TAXONOMY ESTIMATE", ...Object.entries(r.bloom).map(([k,v])=>`${k}: ${v}`), '', 'SUGGESTIONS', ...r.suggestions.map((t,i)=>`${i+1}. ${t}`)];
-  const blob = new Blob([lines.join('
-')], {type:'text/plain;charset=utf-8'});
+  const blob = new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'});
   const url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url; a.download=`KSR-Exam-Quality-${Date.now()}.txt`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); flash('Exam Quality report downloaded ✅');
 }
 
