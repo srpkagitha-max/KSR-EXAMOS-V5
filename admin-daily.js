@@ -245,7 +245,7 @@ function getAllQuestions() {
 function validateQuestionList(list) {
   const health = analyzeQuestionHealth(list);
   const issues = [];
-  health.questions.forEach(report => {
+  (health.questions || []).forEach(report => {
     const question = list[report.index] || {};
     const subjectIndex = Number.isInteger(question.subjectIndex) ? question.subjectIndex : activeSubjectIndex;
     const questionIndex = Number.isInteger(question.subjectQuestionIndex) ? question.subjectQuestionIndex : report.index;
@@ -711,11 +711,19 @@ onAuthStateChanged(auth, async u => {
   }
 
   user = u;
-  setDefaultTimes();
-  await loadMasters();
-  clearCreateForm(false);
-  loadActiveSubject();
-  restoreGeneratedCodes();
+  try {
+    setDefaultTimes();
+    clearCreateForm(false);
+    loadActiveSubject();
+    restoreGeneratedCodes();
+    await loadMasters();
+    window.__KSR_ADMIN_READY__ = true;
+    show('Admin modules ready ✅');
+  } catch (error) {
+    console.error('Admin initialization failed:', error);
+    window.__KSR_ADMIN_READY__ = false;
+    show('Admin initialization error: ' + (error?.message || error), 'err');
+  }
 });
 
 $('logout')?.addEventListener('click', () => signOut(auth));
@@ -1249,7 +1257,7 @@ function exportHealthReport(allQuestions, health, issues) {
   if (!issues.length) lines.push('No issues found. All questions are healthy.');
   issues.forEach((issue, index) => lines.push(`${index + 1}. [${issue.severity.toUpperCase()}] ${issue.text} (${healthIssueLabel(issue.type)})`));
   lines.push('', 'QUESTION SCORES');
-  health.questions.forEach(report => {
+  (health.questions || []).forEach(report => {
     const question = allQuestions[report.index] || {};
     const subject = question.subject || 'General';
     const qNo = Number(question.subjectQuestionIndex ?? report.index) + 1;

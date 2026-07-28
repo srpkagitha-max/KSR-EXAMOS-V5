@@ -1,7 +1,7 @@
 <!doctype html><html lang="te"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0"><title>KSR EXAM OS+ Admin</title><link rel="stylesheet" href="style.css?v=20260728-v5-1-sprint1">
+<meta http-equiv="Expires" content="0"><title>KSR EXAM OS+ Admin</title><link rel="stylesheet" href="style.css?v=20260728-v5-1-sprint2">
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#16865a">
 <meta name="mobile-web-app-capable" content="yes">
@@ -185,11 +185,23 @@
 (function(){
  const home=document.getElementById('adminHome');
  const panels=[...document.querySelectorAll('.adminWorkPanel')];
- function openPanel(id){home.hidden=true;panels.forEach(p=>p.hidden=p.id!==id);if(id==='examPanel')window.dispatchEvent(new CustomEvent('ksr:new-exam'));window.scrollTo({top:0,behavior:'smooth'});}
- document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>openPanel(b.dataset.open)));
- document.querySelectorAll('.backHomeBtn').forEach(b=>b.addEventListener('click',()=>{panels.forEach(p=>p.hidden=true);home.hidden=false;window.scrollTo({top:0,behavior:'smooth'});}));
+ function openPanel(id){
+   const target=document.getElementById(id);
+   if(!target){console.error('Panel not found:',id);return;}
+   home.hidden=true;
+   panels.forEach(p=>p.hidden=p!==target);
+   if(id==='examPanel') window.dispatchEvent(new CustomEvent('ksr:new-exam'));
+   window.scrollTo({top:0,behavior:'smooth'});
+ }
+ document.addEventListener('click',event=>{
+   const openButton=event.target.closest('[data-open]');
+   if(openButton){event.preventDefault();openPanel(openButton.dataset.open);return;}
+   const backButton=event.target.closest('.backHomeBtn');
+   if(backButton){event.preventDefault();panels.forEach(p=>p.hidden=true);home.hidden=false;window.scrollTo({top:0,behavior:'smooth'});}
+ });
+ window.KSROpenAdminPanel=openPanel;
 })();
 </script>
-<script type="module" src="admin-daily.js?v=20260728-v5-1-sprint1"></script>
-<script src="./pwa-register.js?v=20260728-v5-1-sprint1"></script>
+<script type="module" src="admin-daily.js?v=20260728-v5-1-sprint2"></script>
+<script src="./pwa-register.js?v=20260728-v5-1-sprint2"></script>
 </body></html>

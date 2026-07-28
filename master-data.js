@@ -1,6 +1,8 @@
+window.addEventListener('error', event => { console.error('Master Data error:', event.error || event.message); const m=document.getElementById('msg'); if(m){m.className='msg err';m.textContent='Students module error: '+(event.message||'Unknown error');} });
+window.addEventListener('unhandledrejection', event => { console.error('Master Data promise error:', event.reason); const m=document.getElementById('msg'); if(m){m.className='msg err';m.textContent='Students module error: '+(event.reason?.message||event.reason||'Unknown error');} });
 import{auth,db,onAuthStateChanged,signOut,collection,getDocs,addDoc,doc,updateDoc,deleteDoc,serverTimestamp,$,show,esc}from'./app.js';
 let institutes=[],batches=[],students=[],contacts=[],user=null,selectedInstitute='',selectedBatch='';
-onAuthStateChanged(auth,u=>{if(!u)location.href='login.html';else{user=u;loadAll()}});$('logout').onclick=()=>signOut(auth);
+onAuthStateChanged(auth,async u=>{if(!u){location.href='login.html';return;} user=u; try{await loadAll(); show('Students module ready ✅');}catch(error){console.error(error);show('Students data load avvaledu: '+(error?.message||error),'err');}}); if($('logout')) $('logout').onclick=()=>signOut(auth);
 const toast=(m,t='ok')=>show(m,t);
 const instById=id=>institutes.find(x=>x.id===id)||{};const batchById=id=>batches.find(x=>x.id===id)||{};
 
@@ -10,8 +12,8 @@ $('openAddStudent').onclick=()=>{if(!selectedBatch)return toast('Mundhu batch se
 $('closeAddStudent').onclick=()=>toggle('addStudentPanel',false);
 function toggle(id,on){$(id).hidden=!on;if(on)$(id).scrollIntoView({behavior:'smooth',block:'start'})}
 
-$('saveInst').onclick=async()=>{const name=$('instName').value.trim(),logoUrl=$('instLogo').value.trim();if(!name)return toast('Institute name enter cheyyandi','err');await addDoc(collection(db,'institutes'),{name,logoUrl,active:true,createdBy:user.email,createdAt:serverTimestamp()});$('instName').value='';$('instLogo').value='';toast('Institute saved ✅');loadAll()};
-$('saveBatch').onclick=async()=>{const instituteId=$('batchInst').value,name=$('batchName').value.trim();if(!instituteId||!name)return toast('Institute, Batch Name compulsory','err');await addDoc(collection(db,'batches'),{instituteId,name,active:true,createdBy:user.email,createdAt:serverTimestamp()});$('batchName').value='';toast('Batch saved ✅');loadAll()};
+$('saveInst').onclick=async()=>{try{const name=$('instName').value.trim(),logoUrl=$('instLogo').value.trim();if(!name)return toast('Institute name enter cheyyandi','err');await addDoc(collection(db,'institutes'),{name,logoUrl,active:true,createdBy:user?.email||'',createdAt:serverTimestamp()});$('instName').value='';$('instLogo').value='';toast('Institute saved ✅');await loadAll();}catch(error){console.error(error);toast('Institute save avvaledu: '+(error?.message||error),'err')}};
+$('saveBatch').onclick=async()=>{try{const instituteId=$('batchInst').value,name=$('batchName').value.trim();if(!instituteId||!name)return toast('Institute, Batch Name compulsory','err');await addDoc(collection(db,'batches'),{instituteId,name,active:true,createdBy:user?.email||'',createdAt:serverTimestamp()});$('batchName').value='';toast('Batch saved ✅');await loadAll();}catch(error){console.error(error);toast('Batch save avvaledu: '+(error?.message||error),'err')}};
 $('batchInst').onchange=renderMasterBatches;
 
 $('addStudent').onclick=()=>saveStudent({name:$('studentName').value.trim(),phone:$('studentPhone').value.trim(),roll:$('studentRoll').value.trim(),status:$('studentStatus').value});

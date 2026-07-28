@@ -1,4 +1,4 @@
-const KSR_PWA_VERSION = '2026.07.26-cachefix-v1';
+const KSR_PWA_VERSION = '2026.07.28-v5.1-sprint2';
 
 if ('serviceWorker' in navigator) {
   let reloadingForNewWorker = false;
