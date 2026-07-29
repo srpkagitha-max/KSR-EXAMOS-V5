@@ -2,7 +2,7 @@
 <html lang="te"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/>
 <meta content="no-cache, no-store, must-revalidate" http-equiv="Cache-Control"/>
 <meta content="no-cache" http-equiv="Pragma"/>
-<meta content="0" http-equiv="Expires"/><title>KSR EXAM OS+ Admin</title><link href="style.css?v=20260729-new-exam-v1" rel="stylesheet"/>
+<meta content="0" http-equiv="Expires"/><title>KSR EXAM OS+ Admin</title><link href="style.css?v=20260729-new-exam-v2" rel="stylesheet"/>
 <link href="./manifest.json" rel="manifest"/>
 <meta content="#16865a" name="theme-color"/>
 <meta content="yes" name="mobile-web-app-capable"/>
@@ -37,7 +37,7 @@
 <div hidden><label>Exam Name (optional)</label><input id="examTitle" placeholder="Daily Grand Test"/></div>
 <div><label>Active Students</label><input id="activeStudentCount" readonly="" type="number" value="0"/></div>
 <div><label>Backup Codes</label><input id="backupCodeCount" max="100" min="0" type="number" value="10"/></div>
-<div hidden><label>Total Codes</label><input id="codeCount" max="1000" min="1" readonly="" type="number" value="10"/></div>
+<div><label>Total Codes</label><input id="codeCount" max="1100" min="0" readonly="" type="number" value="10"/><small class="fieldHint">Active Students + Backup Codes</small></div>
 <div><label>Start Exam</label><input id="startTime" type="datetime-local"/></div>
 <div><label>End Exam</label><input id="endTime" type="datetime-local"/></div>
 <div><label>Login Before Time</label><input id="loginBefore" type="datetime-local"/></div>
@@ -66,12 +66,12 @@
 <label>Questions Paste Box</label>
 <textarea class="bits-box" id="rawBits" placeholder="1. Question text\nA) Option 1\nB) Option 2 ●\nC) Option 3\nD) Option 4"></textarea>
 <div class="action-row">
-<button id="parseBtn">Parse Questions</button>
+<button id="parseBtn" type="button">Parse Questions</button>
 <button class="gray" id="clearParserBtn" type="button">Clear</button><button class="gray" id="saveSubjectBtn" type="button" hidden>Save Subject to Bank</button>
 <button class="gray" id="addQuestionBtn" type="button">Add Question</button>
 <button class="gray" id="openBankBtn" type="button">Add Question Bank</button>
 <button class="gray" id="saveToBankBtn" type="button" hidden>Save All Subjects to Bank</button>
-</div><div class="examSectionTitle healthTitle"><span>3</span><div><h3>Questions Health Card</h3><p>Total, valid, issue and subject-wise bits</p></div></div><div class="health-box questionsHealthCard" id="health"><div class="questionsHealthIntro"><h3>Questions Health Card</h3><p>Subject-wise questions, problems, readiness మరియు issue question numbers ఇక్కడ కనిపిస్తాయి.</p></div></div><div id="questionEditor"></div><div class="examSectionTitle"><span>4</span><div><h3>Student Exam Preview</h3><p>Ready status vachina taruvatha student screen check cheyyandi</p></div></div><div class="action-row finalExamActions"><button class="orange" id="previewBtn">Student Preview</button><button class="green" id="saveGenerateBtn">Exam Save and Generate Codes</button></div>
+</div><div class="examSectionTitle healthTitle"><span>3</span><div><h3>Questions Health Card</h3><p>Total, valid, issue and subject-wise bits</p></div></div><div class="health-box questionsHealthCard" id="health"><div class="questionsHealthIntro"><h3>Questions Health Card</h3><p>Subject-wise questions, problems, readiness మరియు issue question numbers ఇక్కడ కనిపిస్తాయి.</p></div></div><div id="questionEditor"></div><div class="examSectionTitle"><span>4</span><div><h3>Student Exam Preview</h3><p>Ready status vachina taruvatha student screen check cheyyandi</p></div></div><div class="action-row finalExamActions"><button class="orange" id="previewBtn" type="button">Student Preview</button><button class="green" id="saveGenerateBtn" type="button">Exam Save and Generate Codes</button></div>
 
 
 
@@ -120,8 +120,17 @@
  });
 
  document.querySelectorAll('.backHomeBtn').forEach(b=>b.addEventListener('click',()=>{panels.forEach(p=>p.hidden=true);home.hidden=false;window.scrollTo({top:0,behavior:'smooth'});}));
+ const active=document.getElementById('activeStudentCount');
+ const backup=document.getElementById('backupCodeCount');
+ const total=document.getElementById('codeCount');
+ function updateTotalCodes(){ if(total) total.value=Math.max(0,Number(active?.value||0))+Math.max(0,Number(backup?.value||0)); }
+ backup?.addEventListener('input',updateTotalCodes);
+ active?.addEventListener('input',updateTotalCodes);
+ const totalObserver=new MutationObserver(updateTotalCodes);
+ if(active) totalObserver.observe(active,{attributes:true,attributeFilter:['value']});
+ updateTotalCodes();
 })();
 </script>
-<script src="master-bootstrap.js?v=20260729-new-exam-v1" type="module"></script><script src="admin-daily.js?v=20260729-new-exam-v1" type="module"></script>
-<script src="./pwa-register.js?v=20260729-new-exam-v1"></script>
+<script src="master-bootstrap.js?v=20260729-new-exam-v2" type="module"></script><script src="admin-daily.js?v=20260729-new-exam-v2" type="module"></script>
+<script src="./pwa-register.js?v=20260729-new-exam-v2"></script>
 </body></html>

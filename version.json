@@ -1,6 +1,6 @@
 {
-  "version": "5.1-create-exam-removed",
-  "build": "20260729",
+  "version": "5.2.1",
+  "build": "20260729-new-exam-v2",
   "fixes": [
     "Create Exam card removed from admin dashboard",
     "Create Exam panel blocked from opening",

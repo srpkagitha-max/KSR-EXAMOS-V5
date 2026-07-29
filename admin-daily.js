@@ -18,9 +18,9 @@ import {
   $,
   show,
   esc
-} from './app.js?v=20260729-v5-1-core-runtime-fix';
+} from './app.js?v=20260729-new-exam-v2';
 
-import * as Parser from './parser.js?v=20260729-v5-1-core-runtime-fix';
+import * as Parser from './parser.js?v=20260729-new-exam-v2';
 
 // Parser compatibility layer: using a namespace import prevents the whole Create Exam
 // module from failing when GitHub temporarily serves an older parser.js that lacks one
@@ -100,6 +100,13 @@ let healthIssueFilter = 'all';
 let healthIssueCursor = -1;
 
 const LAST_GENERATED_CODES_KEY = 'ksrLastGeneratedCodesV1';
+
+function updateTotalCodeCount() {
+  const active = Math.max(0, Number($('activeStudentCount')?.value || 0));
+  const backup = Math.max(0, Number($('backupCodeCount')?.value || 0));
+  if ($('codeCount')) $('codeCount').value = active + backup;
+  return active + backup;
+}
 
 // Create Exam Core Bridge V3: available even if a later optional enterprise panel fails.
 window.__KSR_CREATE_EXAM_CORE__ = {
@@ -1030,6 +1037,7 @@ function updateCodeCount(){
   const backupCount = Math.max(0, Math.min(100, Number($('backupCodeCount')?.value || 10)));
   if ($('activeStudentCount')) $('activeStudentCount').value = activeCount;
   if ($('codeCount')) $('codeCount').value = activeCount + backupCount;
+  updateTotalCodeCount();
 }
 
 function syncInstituteName() {
@@ -4254,3 +4262,14 @@ $('bulkMoveBtn')?.addEventListener('click', bulkMoveSelected);
 $('bulkDeleteBtn')?.addEventListener('click', bulkDeleteSelected);
 $('bulkUndoBtn')?.addEventListener('click', restoreBulkSnapshot);
 renderBulkQuestionManager();
+
+
+// New Exam V2 button diagnostics: prevent silent button failures on mobile.
+['parseBtn','clearParserBtn','addQuestionBtn','openBankBtn','previewBtn','saveGenerateBtn'].forEach(id => {
+  const button = $(id);
+  if (!button) return;
+  button.addEventListener('click', () => {
+    button.dataset.lastClick = String(Date.now());
+  }, { capture: true });
+});
+updateTotalCodeCount();
