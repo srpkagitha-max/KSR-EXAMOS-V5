@@ -1,5 +1,5 @@
 {
-  "version": "2026.07.29-local-parser-v6",
+  "version": "2026.07.29-parser-hotfix-v3",
   "build": "INLINE-PARSER-V5-20260729-2107",
   "fixes": [
     "Create Exam card removed from admin dashboard",

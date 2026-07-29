@@ -94,7 +94,10 @@ function normalizeLines(raw) {
   // Recover pasted text where question starts/options were collapsed onto one line.
   text = text
     .replace(/\s+((?:ప్రశ్న|Question|Q)\s*\d{1,4}\s*(?:\.{1,3}|[:\)]))/giu, '\n$1')
-    .replace(/([^\n])\s+(\d{1,4}\s*\.{1,3}\s*(?=[^0-9\s]))/gu, '$1\n$2')
+    // Do not split every inline `number.` sequence. Values such as
+    // `మొత్తం 9.`, `25.`, `60.` and data values inside a question are not
+    // question starts. Numbered questions are reliably detected from their
+    // original line breaks; explicit Q/Question prefixes are recovered above.
     .replace(/([^\n])\s+(\(?(?:[A-D]|ఎ|ఏ|బి|బీ|సి|సీ|డి|డీ)\)?\s*[\).:]\s*)/giu, '$1\n$2')
     .replace(/([^\n])\s+((?:Answer|Ans|Correct\s*Answer|Right\s*Answer|జవాబు|సమాధానం)\s*[:.\-])/giu, '$1\n$2');
 
@@ -240,8 +243,14 @@ function splitQuestionBlocks(lines) {
 
 function parseBlock(lines, index, defaultSubject) {
   const first = questionStart(lines[0]);
-  const body = [first?.text || lines[0], ...lines.slice(1)].filter(Boolean);
-  const questionLines = [];
+  // The first line of a block is always question text, even when it begins
+  // with A/a, B/b, C/c or D/d (for example: `4.A and B...`). Previously that
+  // line was re-tested as an option and questions 4, 14 and 17 were dropped.
+  const firstQuestionLine = first?.text || lines[0] || '';
+  const body = lines.slice(1).filter(Boolean);
+  const questionLines = firstQuestionLine
+    ? [formatQuestionLine(stripMarks(firstQuestionLine))]
+    : [];
   const options = { A: '', B: '', C: '', D: '' };
   const blockUsesLetterOptions = body.some(value => optionKeyFromLine(value)?.scheme === 'letter');
   let answer = '';
