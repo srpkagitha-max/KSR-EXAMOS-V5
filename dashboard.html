@@ -2,7 +2,7 @@
 <html lang="te"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/>
 <meta content="no-cache, no-store, must-revalidate" http-equiv="Cache-Control"/>
 <meta content="no-cache" http-equiv="Pragma"/>
-<meta content="0" http-equiv="Expires"/><title>KSR EXAM OS+ Admin</title><link href="style.css?v=20260729-new-exam-v2" rel="stylesheet"/>
+<meta content="0" http-equiv="Expires"/><title>KSR EXAM OS+ Admin</title><link href="style.css?v=20260729-inline-parser-v5" rel="stylesheet"/>
 <link href="./manifest.json" rel="manifest"/>
 <meta content="#16865a" name="theme-color"/>
 <meta content="yes" name="mobile-web-app-capable"/>
@@ -131,7 +131,80 @@
  updateTotalCodes();
 })();
 </script>
-<script src="new-exam-parser-bridge.js?v=20260729-parser-fix-v4" type="module"></script>
-<script src="master-bootstrap.js?v=20260729-parser-fix-v4" type="module"></script><script src="admin-daily.js?v=20260729-parser-fix-v4" type="module"></script>
-<script src="./pwa-register.js?v=20260729-parser-fix-v4"></script>
+
+<script id="ksrParserInlineFix">
+(function(){
+  'use strict';
+  const BUILD='INLINE-PARSER-V5-20260729-2107';
+  const $=id=>document.getElementById(id);
+  const button=$('parseBtn');
+  if(!button) return;
+
+  let status=$('parserInlineStatus');
+  if(!status){
+    status=document.createElement('div');
+    status.id='parserInlineStatus';
+    status.className='msg ok';
+    status.style.margin='10px 0';
+    status.style.display='block';
+    status.style.fontWeight='800';
+    const actions=button.closest('.action-row');
+    actions?.parentNode?.insertBefore(status,actions);
+  }
+  const show=(text,type='ok')=>{
+    status.className='msg '+type;
+    status.style.display='block';
+    status.textContent=text;
+  };
+  show('Parser build loaded ✅ · '+BUILD);
+  window.__KSR_INLINE_PARSER_BUILD__=BUILD;
+
+  async function waitForCore(ms=4000){
+    const start=Date.now();
+    while(Date.now()-start<ms){
+      const core=window.__KSR_CREATE_EXAM_CORE__;
+      if(core && typeof core.parseRawQuestions==='function') return core;
+      await new Promise(r=>setTimeout(r,100));
+    }
+    return null;
+  }
+
+  async function runParser(event){
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    const raw=($('rawBits')?.value||'').trim();
+    if(!raw){ show('Questions Paste Box empty ga undhi. Questions paste cheyyandi.','err'); return; }
+    show('Parser start అవుతోంది...','ok');
+    button.disabled=true;
+    try{
+      const core=await waitForCore();
+      if(!core){
+        show('admin-daily.js load కాలేదు. GitHub rootలో admin-daily.js, app.js files ఉన్నాయో చూడండి. Build: '+BUILD,'err');
+        return;
+      }
+      const result=core.parseRawQuestions();
+      if(result && result.ok){
+        show(result.count+' questions parsed ✅ · '+BUILD,'ok');
+      }else{
+        show('Questions detect కాలేదు. Number + A/B/C/D options + correct answer dot format check చేయండి.','err');
+      }
+    }catch(err){
+      console.error('Inline parser error',err);
+      show('Parser error: '+(err?.message||String(err))+' · '+BUILD,'err');
+    }finally{
+      button.disabled=false;
+    }
+  }
+
+  button.addEventListener('click',runParser,true);
+  button.addEventListener('touchend',function(e){
+    if(e.cancelable) e.preventDefault();
+    runParser(e);
+  },{capture:true,passive:false});
+})();
+</script>
+
+<script src="master-bootstrap.js?v=20260729-inline-parser-v5" type="module"></script><script src="admin-daily.js?v=20260729-inline-parser-v5" type="module"></script>
+<script src="./pwa-register.js?v=20260729-inline-parser-v5"></script>
 </body></html>

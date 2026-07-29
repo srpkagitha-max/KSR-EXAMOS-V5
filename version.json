@@ -1,10 +1,11 @@
 {
   "version": "2026.07.29-parser-hotfix-v3",
-  "build": "20260729-new-exam-v2",
+  "build": "INLINE-PARSER-V5-20260729-2107",
   "fixes": [
     "Create Exam card removed from admin dashboard",
     "Create Exam panel blocked from opening",
     "Dashboard diagnostics updated",
     "Cache version refreshed"
-  ]
+  ],
+  "updatedAt": "2026-07-29T21:07:00+05:30"
 }

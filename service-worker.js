@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ksr-exam-os-v5-parser-hotfix-v3-20260729';
+const CACHE_NAME = 'ksr-exam-os-v5-inline-parser-v5-20260729';
 const APP_SHELL = [
   './offline.html', './manifest.json', './icon-192.png', './icon-512.png'
 ];
