@@ -1,5 +1,5 @@
 {
-  "version": "5.2.1",
+  "version": "2026.07.29-parser-hotfix-v3",
   "build": "20260729-new-exam-v2",
   "fixes": [
     "Create Exam card removed from admin dashboard",
