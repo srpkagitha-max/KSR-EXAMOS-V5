@@ -18,9 +18,9 @@ import {
   $,
   show,
   esc
-} from './app.js?v=20260729-parser-hotfix-v3';
+} from './app.js?v=20260729-parser-fix-v4';
 
-import * as Parser from './parser.js?v=20260729-parser-hotfix-v3';
+import * as Parser from './parser.js?v=20260729-parser-fix-v4';
 
 // Parser compatibility layer: using a namespace import prevents the whole Create Exam
 // module from failing when GitHub temporarily serves an older parser.js that lacks one
