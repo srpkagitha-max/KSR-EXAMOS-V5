@@ -791,3 +791,14 @@ textarea{line-height:1.55;resize:vertical}
 .subjectHealthActions{display:flex;justify-content:flex-end;margin-top:12px}
 .subjectDemoBtn{width:100%;max-width:360px}
 @media(max-width:640px){.subjectHealthActions{justify-content:stretch}.subjectDemoBtn{max-width:none}}
+
+/* New Exam workflow — 20260729 */
+.examSectionTitle{display:flex;align-items:center;gap:12px;margin:18px 0 12px;padding:12px 14px;border-radius:14px;background:#f3fbf7;border:1px solid #cce9dc}
+.examSectionTitle>span{display:grid;place-items:center;min-width:34px;height:34px;border-radius:50%;background:#16865a;color:#fff;font-weight:900}
+.examSectionTitle h3{margin:0;color:#145c43}
+.examSectionTitle p{margin:3px 0 0;color:#66776f;font-size:12px}
+.healthTitle{margin-top:22px}
+.basicInfoGrid{margin-bottom:18px}
+.finalExamActions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.finalExamActions button{min-height:48px;font-size:15px;font-weight:900}
+@media(max-width:700px){.finalExamActions{grid-template-columns:1fr}.examSectionTitle{align-items:flex-start}}
