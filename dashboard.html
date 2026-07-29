@@ -15,9 +15,8 @@
 <div class="adminTopbar"><div class="adminBrandLine"><img alt="" src="icon-192.png"/><div><h1>KSR EXAM OS+</h1><p>Smart • Secure • Scalable</p></div></div><div class="adminTopActions"><a class="btn gray" href="index.html">Student Login</a><button class="gray" id="logout">Logout</button></div></div>
 <div class="wrap"><div id="msg"></div>
 <section class="adminHomePanel" id="adminHome">
-<div class="adminWelcome"><h2>Welcome to Green Command Center</h2><p>Exams, students, question bank మరియు results అన్నీ ఒకే చోట manage చేయండి.</p></div>
+<div class="adminWelcome"><h2>Welcome to Green Command Center</h2><p>Students, question bank, saved exams, codes మరియు results అన్నీ ఒకే చోట manage చేయండి.</p></div>
 <div class="featureGrid">
-<button class="featureCard featureBlue" data-open="examPanel"><span>📝</span><b>Create Exam</b><small>Questions paste, preview, save &amp; codes</small></button>
 <button class="featureCard featureGold" data-open="codesPanel"><span>🔐</span><b>Generated Codes</b><small>Copy, PDF and WhatsApp share</small></button>
 <button class="featureCard featureGreen" data-open="resultsPanel"><span>🏆</span><b>Results &amp; Ranks</b><small>Ranks, summary and PDF</small></button>
 <button class="featureCard featurePurple" data-open="savedPanel"><span>🔎</span><b>Search Exams</b><small>Search or load all saved exams</small></button>
@@ -27,7 +26,7 @@
 <a class="featureCard featureGold" href="diagnostics.html"><span>🛡️</span><b>System Check</b><small>Files, parser and configuration test</small></a>
 </div>
 </section>
-<section class="adminWorkPanel" hidden="" id="examPanel">
+<section class="adminWorkPanel removedFeature" hidden="" id="examPanel" aria-hidden="true" style="display:none!important">
 <button class="backHomeBtn" type="button">← Main Features</button>
 <div class="card"><div class="sectionHeadRow"><div><h2>Create Daily Exam</h2><p class="small">Fresh exam form. Old exam data automatic ga load avvadu.</p></div><div class="action-row compact"><button class="gray" id="recoverDraftBtn" type="button">Recover Draft</button><button class="danger" id="clearExamFormBtn" type="button">Clear Form</button></div></div><div class="grid two">
 <div><label>Institute</label><select id="instituteId"></select><input id="instituteName" type="hidden"/></div>
@@ -105,7 +104,7 @@
 (function(){
  const home=document.getElementById('adminHome');
  const panels=[...document.querySelectorAll('.adminWorkPanel')];
- function openPanel(id){home.hidden=true;panels.forEach(p=>p.hidden=p.id!==id);if(id==='examPanel')window.dispatchEvent(new CustomEvent('ksr:new-exam'));window.scrollTo({top:0,behavior:'smooth'});}
+ function openPanel(id){if(id==='examPanel')return;home.hidden=true;panels.forEach(p=>p.hidden=p.id!==id);window.scrollTo({top:0,behavior:'smooth'});}
  document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>openPanel(b.dataset.open)));
  document.querySelectorAll('.backHomeBtn').forEach(b=>b.addEventListener('click',()=>{panels.forEach(p=>p.hidden=true);home.hidden=false;window.scrollTo({top:0,behavior:'smooth'});}));
 })();

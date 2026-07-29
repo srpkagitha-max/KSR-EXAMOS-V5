@@ -1,10 +1,10 @@
 {
-  "version": "5.1-core-runtime-fix",
+  "version": "5.1-create-exam-removed",
   "build": "20260729",
   "fixes": [
-    "Parser module startup crash fixed",
-    "Active student counter field fixed",
-    "Duplicate admin module import removed",
+    "Create Exam card removed from admin dashboard",
+    "Create Exam panel blocked from opening",
+    "Dashboard diagnostics updated",
     "Cache version refreshed"
   ]
 }

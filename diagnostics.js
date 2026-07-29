@@ -2,7 +2,7 @@ import { parseQuestionsDetailed } from './parser.js';
 
 const $ = id => document.getElementById(id);
 const REQUIRED_FILES = ['index.html','login.html','dashboard.html','exam.html','result.html','questions.html','question-bank.html','master-data.html','live-monitor.html','style.css','app.js','firebase-config.js','admin-daily.js','parser.js','service-worker.js','manifest.json','version.json','icon-192.png','icon-512.png'];
-const REQUIRED_DASHBOARD_IDS = ['instituteId','batchId','examId','startTime','endTime','secondsPerQuestion','rawBits','parseBtn','saveExamBtn'];
+const REQUIRED_DASHBOARD_IDS = ['adminHome','codesPanel','resultsPanel','savedPanel'];
 let checks = [];
 
 function add(name, ok, detail='') { checks.push({name,ok:Boolean(ok),detail}); }
@@ -51,7 +51,7 @@ D) నాలుగు`;
     const statementOut=parseQuestionsDetailed(statementSample,'General');
     add('Numbered statement preservation',statementOut.questions.length===2 && statementOut.questions[0]?.question.includes('2. రెండవ వాక్యం'),`${statementOut.questions.length} questions; statements preserved`);
   }catch(e){add('Question parser',false,e.message);}
-  try{const html=await (await fetch(`./dashboard.html?check=${Date.now()}`,{cache:'no-store'})).text();const missing=REQUIRED_DASHBOARD_IDS.filter(id=>!html.includes(`id="${id}"`));add('Create Exam controls',missing.length===0,missing.length?`Missing: ${missing.join(', ')}`:'All required controls found');}catch(e){add('Create Exam controls',false,e.message);}
+  try{const html=await (await fetch(`./dashboard.html?check=${Date.now()}`,{cache:'no-store'})).text();const missing=REQUIRED_DASHBOARD_IDS.filter(id=>!html.includes(`id="${id}"`));add('Admin dashboard controls',missing.length===0,missing.length?`Missing: ${missing.join(', ')}`:'Core dashboard panels found');}catch(e){add('Admin dashboard controls',false,e.message);}
   render();
 }
 $('runChecks').addEventListener('click',run);run();
